@@ -6,6 +6,16 @@
 
 using namespace std;
 
+Origami::Origami(std::string s) : _fileName(s) {
+        std::cout << "Step 1: Input file reading \n";
+        if (!input()) {
+            std::cout << "Error occured in input file\n" << s <<
+            "\nNo file found" << std::endl;
+            exit(1);
+        };
+        std::cout << "................ DONE\n";
+}
+
 bool Origami::input() {
     ifstream input{_fileName};
     if (!input.is_open()) {
@@ -28,7 +38,7 @@ bool Origami::input() {
         _nucleotide[ ID{strandOld, baseOld} ] =
                 Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld, yOld, zOld},
                             ID{pairStrandOld, pairBaseOld}, isABreak};
-        if (isABreak) makeHP(strandOld, baseOld);
+        if (isABreak) makeHB(strandOld, baseOld);
 
         if (_resNumInEachStrand.find(strandOld) == _resNumInEachStrand.end())
             _resNumInEachStrand[strandOld] = 1;
@@ -47,13 +57,13 @@ bool Origami::input() {
     // assign last residue
     _nucleotide[ ID{strand, base} ] =
             Nucleotide{ ID{strand, base}, Vector3Dd{x, y, z}, ID{pairStrand, pairBase}, true};
-    makeHP(strand, base);
+    makeHB(strand, base);
     ++_resNumInEachStrand[strand];
 
     _strandNum = _resNumInEachStrand.size();
 
     input.close();
-    testInput();
+//    testInput();
     return true;
 }
 
@@ -102,7 +112,7 @@ bool Origami::isBreak(int strand, int base, int pairStrand, int pairBase,
 }
 
 
-void Origami::makeHP(int strand, int base) {
+void Origami::makeHB(int strand, int base) {
     if (_breaksOnEachStand.find(strand) == _breaksOnEachStand.end()) {
         vector<int> thisStrand;
         thisStrand.push_back(base);
@@ -114,6 +124,7 @@ void Origami::makeHP(int strand, int base) {
 
 
 vector<pair<ID, ID>> Origami::makeHBPs() {
+    std::cout << "Step 2: Helical break pairs generating \n";
 
     ID id, idleft, idright;
 
@@ -125,8 +136,7 @@ vector<pair<ID, ID>> Origami::makeHBPs() {
         vector<int> strand = _breaksOnEachStand[i];
 
         for (auto item = 1; item < strand.size()-1; ++item) {
-            if (strand[item]==46&&i==148)
-                cout << endl;
+
             id = {i, strand[item]};
 
             if (!_nucleotide[id].withPair()) {
@@ -228,30 +238,27 @@ vector<pair<ID, ID>> Origami::makeHBPs() {
                                       false, false, false);
     }
 
+    std::cout << "................ DONE\n";
 
     return crossovers;
-//    _helicalBreakPairs.print();
 
 }
 
 void Origami::processNodes() {
+
+    std::cout << "Step 3: Nodes generating \n";
+
     int hb, hbold;
     HelicalBreakPair hbp, hbpold;
     for (int i = 0; i < _strandNum; i++) {
         vector<int> strand = _breaksOnEachStand[i];
         hb = strand[0];
-        if (i==148)
-            cout << endl;
-
+        hbp = _helicalBreakPairs.findTypeFromID({i,hb});
         for (int item = 1; item < strand.size(); ++item) {
-
             hbold = hb;
-
             hb = strand[item];
             hbpold = hbp;
             hbp = _helicalBreakPairs.findTypeFromID({i,hb});
-            if (hb==46&&i==148)
-                cout << endl;
             if ((hb - hbold)==1) {
                 if (HelicalBreakPair::similar(hbpold, hbp) && hbp.is_typeA() ) {
                     if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold}))>10&& hbp.is_typeB()) {
@@ -271,9 +278,11 @@ void Origami::processNodes() {
             }
             _graph.insertNode(makeNode(hbpold));
         }
-        _graph.insertNode(makeNode(hbpold));
+        _graph.insertNode(makeNode(hbp));
     }
     _graph.resizeGraph();
+    std::cout << "................ DONE\n";
+
 }
 
 
@@ -304,7 +313,8 @@ Node Origami::makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2) {
     std::vector<std::pair<ID,ID>> ids;
     ids.push_back(pair1.get_ids());
     ids.push_back(pair2.get_ids());
-
+    if (pair1.get_ids().first.baseID()==2501||pair1.get_ids().second.baseID()==2501)
+        cout << endl;
     double mass = 2 * MASS;
     Vector3Dd position = (helicalCenter(pair1.get_ids().first)
                          + helicalCenter(pair2.get_ids().first)) * 0.5;
@@ -326,16 +336,7 @@ Node Origami::makeNode(HelicalBreakPair pair) {
     return Node{type, ids, mass, position, vdWradii};
 }
 
-Edge Origami::makeEdge(Node node) {
 
-    node.get_num();
-
-//    Edge(const std::pair<int, int> &_endsNode, const std::pair<int, int> &_types,
-//    bool _crossover, const std::vector<std::pair<ID, ID>> &_ids)
-//    : _endsNode(_endsNode),_types(_types), _crossover(_crossover), _ids(_ids)
-
-    return Edge();
-}
 
 
 Edge Origami::makeEdgeCrossover(ID id1, ID id2) {
@@ -343,11 +344,71 @@ Edge Origami::makeEdgeCrossover(ID id1, ID id2) {
     int b = _graph.findNodeNum(id2);
     int c = _graph.findNodeType(id1);
     int d = _graph.findNodeType(id2);
-    if (id1.baseID()==2477||id2.baseID()==2477)
-        cout << a << "\t"<< b << endl;
     return Edge({a, b}, {c, d}, {id1, id2}, true, {});
+}
+
+void Origami::processCrossovers(std::vector<std::pair<ID, ID>> crossovers) { // insert edges into _graph
+    std::cout << "Step 4: Crossovers generating \n";
+
+    ID id1, id2;
+    Edge edge;
+    for (const auto & cross : crossovers) {
+        id1 = cross.first;
+        id2 = cross.second;
+        edge = makeEdgeCrossover(id1, id2);
+        _graph.insertEdge(edge, edge.get_endsNode().first, edge.get_endsNode().second);
+    }
+    _graph.howManyFourWays();
+    std::cout << "................ DONE\n";
+
+}
+
+
+void Origami::connecting() {
+    std::cout << "Step 5: Graph connecting \n";
+
+    int node1, node2;
+    ID id1, id2;
+    for (int i = 0; i < _strandNum; i++) {
+        vector<int> strand = _breaksOnEachStand[i];
+        id2 = {i, strand[0]};
+        node2 = _graph.findNodeNum(id2);
+        for (int item = 1; item < strand.size(); ++item) {
+            id1 = id2;
+            node1 = node2;
+            id2 = {i, strand[item]};
+            node2 = _graph.findNodeNum(id2);
+            if (node1 == node2) continue;
+            _graph.insertEdge(makeEdge(id1, id2), node1, node2);
+        }
+    }
+
+    std::cout << "................ DONE\n";
+
 }
 
 
 
+
+
+Edge Origami::makeEdge(ID id1, ID id2) {
+
+
+    int a = _graph.findNodeNum(id1);
+    int b = _graph.findNodeNum(id2);
+    int c = _graph.findNodeType(id1);
+    int d = _graph.findNodeType(id2);
+
+    vector<pair<ID, ID>> ids;
+
+    int strand = id1.strandID();
+    if (id1.baseID() < id2.baseID())
+    for (int item = id1.baseID()+1; item < id2.baseID(); ++item)
+        ids.push_back({{strand, item}, _nucleotide[{strand, item}].pairID()});
+    else
+        for (int item = id2.baseID()+1; item < id1.baseID(); ++item)
+            ids.push_back({{strand, item}, _nucleotide[{strand, item}].pairID()});
+
+    return Edge({a, b}, {c, d}, {id1, id2}, false, ids);
+}
 

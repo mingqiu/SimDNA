@@ -182,6 +182,7 @@ public:
             _endsHB(_endsHB), _crossover(_crossover) {}
 
 
+    size_t length() const { return _ids.size(); }
     double get_stretchConstant() const { return _stretchConstant; }
     void set_stretchConstant(double _stretchConstant) { Edge::_stretchConstant = _stretchConstant; }
     const std::pair<int, int> &get_endsNode() const { return _endsNode; }
@@ -276,6 +277,8 @@ public:
         if (!this->idExists(nd.get_ids()[0].first)) {
 
             ++_size;
+            if (_size==1099)
+                std::cout << std::endl;
             nd.set_num(_size);
             _member[_size] = nd;
             for (const auto & item : nd.get_ids()) {
@@ -326,7 +329,12 @@ public:
     void insertEdge(Edge eg, int c1, int c2);
     bool findEdge(int id1, int id2) const;
     int findNodeType(ID id);
+    int findNodeType(int a);
+    const std::vector<std::vector<int>>& showGraph() const { return _origamiGraph; }
+
     int findNodeNum(ID id);
+    int howManyNodes() { return _nodes.size();}
+    Vector3Dd nodeCenter(int a) { return _nodes.findTypeFromIndex(a).get_position();}
     void printAllNodes() {
         for (auto && item :_nodes.member())
             for (auto && item1 : item.second.get_ids())
@@ -338,67 +346,70 @@ public:
     void printID(int a, int b, int item1) {
         ID id;
         id = _nodes.findTypeFromIndex(a).get_ids()[item1].first;
-        if (id.baseID() == 2533) {
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
-//            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
-            std::cout << "+++++++++++++++++++" << std::endl;
-        }
-//        std::cout << id << std::endl;
-        if (id.baseID() == 2501) std::cout << a << "\t" << b<< "1"<< std::endl;
+//        if (id.baseID() == 2533) {
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
+////            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
+//            std::cout << "+++++++++++++++++++" << std::endl;
+//        }
+        std::cout << id << std::endl;
+//        if (id.baseID() == 2501) std::cout << a << "\t" << b<< "1"<< std::endl;
 
         id = _nodes.findTypeFromIndex(a).get_ids()[item1].second;
-        if (id.baseID() == 2533) {
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
-//            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
-            std::cout << "+++++++++++++++++++" << std::endl;
-        }
-//        std::cout << id << std::endl;
-        if (id.baseID() == 2501) std::cout << a << "\t" << b<< "2"<< std::endl;
+//        if (id.baseID() == 2533) {
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
+////            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
+//            std::cout << "+++++++++++++++++++" << std::endl;
+//        }
+        std::cout << id << std::endl;
+//        if (id.baseID() == 2501) std::cout << a << "\t" << b<< "2"<< std::endl;
 
         id = _nodes.findTypeFromIndex(b).get_ids()[item1].first;
-//        std::cout << id << std::endl;
-        if (id.baseID() == 2533) {
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
-//            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
-            std::cout << "+++++++++++++++++++" << std::endl;
-        }
+        std::cout << id << std::endl;
+//        if (id.baseID() == 2533) {
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
+////            std::cout << a << "\t" << b << std::endl;
+//
+////            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
+//
+//            std::cout << "+++++++++++++++++++" << std::endl;
+//        }
 
         id = _nodes.findTypeFromIndex(b).get_ids()[item1].second;
-        if (id.baseID() == 2533) {
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
-            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
-//            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
-            std::cout << "+++++++++++++++++++" << std::endl;
-        }
-//        std::cout << id << std::endl;
-        if (id.baseID() == 2501) std::cout << a << "\t" << b<< "4"<< std::endl;
+//        if (id.baseID() == 2533) {
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[1].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(a).get_ids()[0].second << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].first << std::endl;
+//            std::cout << _nodes.findTypeFromIndex(b).get_ids()[0].second << std::endl;
+////            std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
+//            std::cout << "+++++++++++++++++++" << std::endl;
+//        }
+        std::cout << id << std::endl;
+//        if (id.baseID() == 2501) std::cout << a << "\t" << b<< "4"<< std::endl;
 
 
     }
@@ -412,35 +423,13 @@ public:
             if (edge.get_types().first == 1 && edge.get_types().second == 1 && edge.is_crossover()) {
                 ++sum;
 
-//                if (edge.get_endsHB().first.baseID()==33||edge.get_endsHB().second.baseID()==33)
-//                    std::cout << //id1 << "\t" << id2 <<
-//                    edge.get_endsHB().first << "\t" <<
-//                    edge.get_endsHB().second << "\t" <<
-//                    edge.is_ds() <<
-//                    std::endl;
-
                 a = edge.get_endsNode().first;
                 b = edge.get_endsNode().second;
 
-//                std::cout << a << "\t" << b << "\t";
-//                std::cout << _nodes.findTypeFromIndex(a).get_ids().size() << std::endl;
                 for (int item1=0; item1 < _nodes.findTypeFromIndex(a).get_ids().size(); ++item1) {
 //                    printID(a, b, item1);
                 }
 
-//                for (int item1=0; item1 < _nodes.findTypeFromIndex(b).get_ids().size(); ++item1) {
-//
-//
-//                    id = _nodes.findTypeFromIndex(b).get_ids()[item1].first;
-//                    printID(id);
-//                    id = _nodes.findTypeFromIndex(b).get_ids()[item1].second;
-//                    printID(id);
-//
-//                }
-//                for (const auto& item1 : _nodes.findTypeFromIndex(a).get_ids())
-//                    std::cout << "test" << std::endl;
-//                    std::cout << item1.first << "\t" << item1.second << "\t";
-//                std::cout << std::endl;
             }
         }
         std::cout << sum << std::endl;

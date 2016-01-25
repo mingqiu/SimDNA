@@ -51,3 +51,7 @@ int OrigamiGraph::findNodeType(ID id) {
 int OrigamiGraph::findNodeNum(ID id) {
     return _nodes.findIndexFromID(id);
 }
+
+int OrigamiGraph::findNodeType(int a) {
+    return _nodes.findTypeFromIndex(a).get_type();
+}

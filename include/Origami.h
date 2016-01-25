@@ -41,8 +41,7 @@ class Origami {
 
 
 
-// Initialized as reading input, when function input() is invoked
-
+// Initialized when function makeHBPs() is invoked
     HelicalBreakPairs _helicalBreakPairs;
 
 
@@ -51,69 +50,50 @@ class Origami {
 
 
 public:
-    Origami(std::string s) : _fileName(s) {
-        std::cout << "Step 1: Input file reading ... ";
-
-        if (!input()) {
-            std::cout << "Error occured in input file\n" << s <<
-            "\nNo file found" << std::endl;
-            exit(1);
-        };
-        std::cout << "DONE\n";
-
-    }
-
+    Origami(std::string s);
     std::vector<std::pair<ID, ID>> makeHBPs();
-    Node makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2);
-    Node makeNode(HelicalBreakPair pair1);
-    Edge makeEdge(Node node);
-    Edge makeEdgeCrossover(ID id1, ID id2);
-
     void processNodes(); // insert nodes into _graph
-    void processCrossovers(std::vector<std::pair<ID, ID>> crossovers) { // insert edges into _graph
-        ID id1, id2;
-        Edge edge;
-        for (const auto & cross : crossovers) {
-            id1 = cross.first;
-            id2 = cross.second;
-            edge = makeEdgeCrossover(id1, id2);
-//            if (id1.baseID()==2501||id2.baseID()==2501)
-//                std::cout << //id1 << "\t" << id2 <<
-//                        edge.get_endsHB().first << "\t" <<
-//                        edge.get_endsHB().second << "\t" <<
-//                        edge.is_ds() <<
-//                        std::endl;
-            _graph.insertEdge(edge, edge.get_endsNode().first, edge.get_endsNode().second);
-        }
-        _graph.howManyFourWays();
-    }
+    void processCrossovers(std::vector<std::pair<ID, ID>> crossovers);
+    void connecting();
 
 
 
 private:
 
+/****** Involved in class initialization  *****/
+
 /*
  * Read input *.pairs file to initialize an Origami class
- * Involved in class initialization
  */
     bool input();
 /*
  * Examine whether a residue is at helical break
- * Involved in class initialization
  */
     bool isBreak(int, int, int, int, int, int, int, int);
 /*
  * Collect all ID belonging to helical break into _breaksOnEachStand
- * */
-    void makeHP(int strand, int base);
-    Vector3Dd helicalCenter(ID id1);
+ */
+    void makeHB(int strand, int base);
 
+
+/****** Useful functions  *****/
+    Vector3Dd helicalCenter(ID id1);
+    Node makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2);
+    Node makeNode(HelicalBreakPair pair1);
+    Edge makeEdgeCrossover(ID id1, ID id2);
+    Edge makeEdge(int node1, int node2);
+    Edge makeEdge(ID id1, ID id2);
 
 
 /***********  Test functions below  *******************/
 
     void testInput();
     void testhbpAssign();
+
+
+public:
+
+    void toPDB(std::string str);
 
 };
 
