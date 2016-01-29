@@ -44,7 +44,7 @@ class Origami {
 // Initialized when function makeDiscontinuity() is invoked
     AxialDiscons _axialDiscons;
 
-
+// Initialized when function processNodes, processCrossovers, connecting are invoked
     OrigamiGraph _graph;
 
 
@@ -55,9 +55,21 @@ public:
  * Identify the type of all axial discontinuities and initialize _axialDiscons
  */
     std::vector<std::pair<ID, ID>> makeDiscontinuity();
-    void processNodes(); // insert nodes into _graph
+/*
+ * Insert nodes into _graph
+ */
+    void processNodes();
+/*
+ * Insert edges(crossovers) into _graph
+ */
     void processCrossovers(std::vector<std::pair<ID, ID>> crossovers);
+/*
+ * Insert edges(other than crossovers) into _graph
+ */
     void connecting();
+/*
+ * Output PDB file
+ */
     void toPDB(std::string str);
 
 
@@ -100,11 +112,24 @@ private:
 
 
     /****** Useful functions  *****/
+
+
+/* return coordinate of helical center given a helical break pair
+ * if only one resiude, return coor. of this residue
+ * otherwise return the average of two residues
+ * input:
+ * output: coordinate
+ */
     Vector3Dd helicalCenter(ID id1);
+
     Node makeNode(AxialDiscontinuity pair1, AxialDiscontinuity pair2);
+
     Node makeNode(AxialDiscontinuity pair1);
+
     Edge makeEdgeCrossover(ID id1, ID id2);
+
     Edge makeEdge(ID id1, ID id2);
+
 
 
 /***********  Test functions below  *******************/

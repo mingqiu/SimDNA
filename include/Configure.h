@@ -13,8 +13,12 @@ const std::string inputJsonFileName = "A_2D";
 //const std::string inputJsonFileName = "pointer_v1_12_no_deletion";
 //const std::string inputJsonFileName = "aNANO_3D_7_14";
 
-#define MASS 649
-#define STRETCH_DS 1
-#define STRETCH_SS 0.1
-#define CROSSOVER_DIS 18 // if a neighbor bp is seperated by this distance, it's a crossover
+#define MASS 649 // (g/mol)
+#define STRETCH_DS 1 // (pN/nm)
+#define STRETCH_SS 0.1 // (pN/nm)
+#define CROSSOVER_DIS 18 // (A) if two neighbor bps are seperated by this distance, it's a crossover
+#define VDWRADII_1 1 // (nm) vdw radii of type 1# node
+#define VDWRADII_2 0.2 // (nm) vdw radii of type 2# node
+#define VDWRADII_3 1.2 // (nm) vdw radii of type 3# node
+
 #endif //SIMDNA_CONFIGURE_H

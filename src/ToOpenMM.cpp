@@ -23,7 +23,7 @@ void Origami::toPDB(std::string str) {
     for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
         fprintf(pdb, "CONECT%5d", aHelicalBreakPair);
         for (auto connectingHelicalPair : origamiAdjacencyList[aHelicalBreakPair]) {
-            fprintf(pdb, "%5d", (int) connectingHelicalPair);
+            fprintf(pdb, "%5d", connectingHelicalPair);
         }
         fprintf(pdb, "\n");
     }

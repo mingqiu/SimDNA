@@ -68,7 +68,7 @@ bool Origami::input() {
 }
 
 vector<pair<ID, ID>> Origami::makeDiscontinuity() {
-    std::cout << "Step 2: Axial discountinuities generating \n";
+    std::cout << "Step 2: Axial discontinuities generating \n";
 
     ID id, idleft, idright;
     vector<pair<ID, ID>> crossovers;
@@ -78,7 +78,7 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
         for (auto item = 1; item < strand.size()-1; ++item) {
             id = {i, strand[item]};
 
-            // if belongs to single strand
+// if belongs to single strand
             if (!_nucleotide[id].withPair()) {
                 _axialDiscons.insert({id, {-1, -1}}, false, false, true);
                 continue;
@@ -87,6 +87,8 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
             idleft = {i, strand[item-1]};
             idright = {i, strand[item+1]};
 
+// if belongs to double strand
+            // if it has a left neighbor discontinuity
             if ((id.baseID() - idleft.baseID()) == 1) {
                 if (dist(helicalCenter(idleft), helicalCenter(id))>CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
@@ -94,82 +96,65 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
                     crossovers.push_back({idleft, id});
                     continue;
                 }
-
                 if ((idright.baseID() - id.baseID()) == 1) {
                     if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
                         _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                              false, true, false);
                         crossovers.push_back({idright, id});
-
                     }
-                    else {
+                    else
                         _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                              _nucleotide[idright].withPair(), false, false);
-
-                    }
                     continue;
                 }
-
-
                 else _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                           true, false, false);
                 continue;
             }
+
+            // if it has a right neighbor discontinuity
             if ((idright.baseID() - id.baseID()) == 1) {
-                if (dist(helicalCenter(idright), helicalCenter(id))>10) {
+                if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          false, true, false);
                     crossovers.push_back({idright, id});
-
                 }
-                else {
+                else
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          _nucleotide[idright].withPair(), false, false);
-
-                }
                 continue;
             }
-            _axialDiscons.insert({id, _nucleotide[id].pairID()},
-                                 false, false, false);
-
+            _axialDiscons.insert({id, _nucleotide[id].pairID()}, false, false, false);
         }
 
+// start residue in a strand
         id = {i, strand[0]};
         idright = {i, strand[1]};
 
-        if (!_nucleotide[id].withPair()) {
+        if (!_nucleotide[id].withPair())
             _axialDiscons.insert({id, {-1, -1}}, false, false, true);
-        }
 
         else if ((idright.baseID() - id.baseID()) == 1) {
-            if (dist(helicalCenter(idright), helicalCenter(id))>10) {
+            if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);
                 crossovers.push_back({idright, id});
-
             }
-
             else _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                       _nucleotide[idright].withPair(), false, false);
         }
-        else
-        _axialDiscons.insert({id, _nucleotide[id].pairID()},
-                             false, false, false);
+        else _axialDiscons.insert({id, _nucleotide[id].pairID()}, false, false, false);
 
-
+// end residue in a strand
         id = {i, strand[strand.size()-1]};
         idleft = {i, strand[strand.size()-2]};
 
-        if (!_nucleotide[id].withPair()) {
-            _axialDiscons.insert({id, {-1, -1}}, false, false, true);
-        }
-
+        if (!_nucleotide[id].withPair()) _axialDiscons.insert({id, {-1, -1}}, false, false, true);
         else if ((id.baseID() - idleft.baseID()) == 1) {
-            if (dist(helicalCenter(idleft), helicalCenter(id))>10) {
+            if (dist(helicalCenter(idleft), helicalCenter(id))>CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);
                 crossovers.push_back({idleft, id});
-
             }
             else _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                       true, false, false);
@@ -181,6 +166,8 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
 
     std::cout << "................ DONE\n";
 
+//    for (const auto &item1: crossovers)
+//        cout << item1.first << "\t" << item1.second << endl;
     return crossovers;
 
 }
@@ -202,7 +189,7 @@ void Origami::processNodes() {
             hbp = _axialDiscons.findTypeFromID({i, hb});
             if ((hb - hbold)==1) {
                 if (AxialDiscontinuity::similar(hbpold, hbp) && hbp.is_typeA() ) {
-                    if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold}))>10&& hbp.is_typeB()) {
+                    if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold}))>CROSSOVER_DIS&& hbp.is_typeB()) {
                         if (item == strand.size() - 1) break;
                         hb = strand[item + 1];
                         hbp = _axialDiscons.findTypeFromID({i, hb});
@@ -227,77 +214,18 @@ void Origami::processNodes() {
 }
 
 
-void Origami::testhbpAssign() {
-    int hb, hbold, hbp;
-    ID id, idleft, idright;
-
-    std::ofstream myfile;
-    myfile.open ("test2.txt");
-    for (int i = 0; i < _strandNum; i++) {
-        vector<int> strand = _breaksOnEachStand[i];
-
-        for (int item = strand.size()-1; item >=0; --item) {
-            id = {i,strand[item]};
-            hbp = _axialDiscons.findIndexFromID(id);
-            myfile << id << "\t" << _nucleotide[id].pairID() << "\t" <<
-            (_axialDiscons.findTypeFromIndex(hbp).is_typeA() &&
-             _axialDiscons.findTypeFromIndex(hbp).is_typeB()) << endl;
-        }
-
-    }
-    myfile.close();
-
-}
-
-Node Origami::makeNode(AxialDiscontinuity pair1, AxialDiscontinuity pair2) {
-    int type = 1;
-    std::vector<std::pair<ID,ID>> ids;
-    ids.push_back(pair1.get_ids());
-    ids.push_back(pair2.get_ids());
-    double mass = 2 * MASS;
-    Vector3Dd position = (helicalCenter(pair1.get_ids().first)
-                         + helicalCenter(pair2.get_ids().first)) * 0.5;
-    double vdWradii = 1;
-
-    return Node{type, ids, mass, position, vdWradii};
-
-}
-
-Node Origami::makeNode(AxialDiscontinuity pair) {
-    int type = pair.is_single() ? 3 : 2;
-    std::vector<std::pair<ID,ID>> ids;
-    ids.push_back(pair.get_ids());
-
-    double mass = 1.0/(type - 1) * MASS;
-    Vector3Dd position = helicalCenter(pair.get_ids().first);
-    double vdWradii = 0.2;
-
-    return Node{type, ids, mass, position, vdWradii};
-}
-
-
-
-
-Edge Origami::makeEdgeCrossover(ID id1, ID id2) {
-    int a = _graph.findNodeNum(id1);
-    int b = _graph.findNodeNum(id2);
-    int c = _graph.findNodeType(id1);
-    int d = _graph.findNodeType(id2);
-    return Edge({a, b}, {c, d}, {id1, id2}, true, {});
-}
-
-void Origami::processCrossovers(std::vector<std::pair<ID, ID>> crossovers) { // insert edges into _graph
+void Origami::processCrossovers(std::vector<std::pair<ID, ID>> crossovers) {
     std::cout << "Step 4: Crossovers generating \n";
 
     ID id1, id2;
     Edge edge;
-    for (const auto & cross : crossovers) {
+    for (const auto &cross : crossovers) {
         id1 = cross.first;
         id2 = cross.second;
         edge = makeEdgeCrossover(id1, id2);
         _graph.insertEdge(edge, edge.get_endsNode().first, edge.get_endsNode().second);
     }
-    _graph.howManyFourWays();
+//    _graph.howManyFourWays();
     std::cout << "................ DONE\n";
 
 }
@@ -329,25 +257,4 @@ void Origami::connecting() {
 
 
 
-
-Edge Origami::makeEdge(ID id1, ID id2) {
-
-
-    int a = _graph.findNodeNum(id1);
-    int b = _graph.findNodeNum(id2);
-    int c = _graph.findNodeType(id1);
-    int d = _graph.findNodeType(id2);
-
-    vector<pair<ID, ID>> ids;
-
-    int strand = id1.strandID();
-    if (id1.baseID() < id2.baseID())
-    for (int item = id1.baseID()+1; item < id2.baseID(); ++item)
-        ids.push_back({{strand, item}, _nucleotide[{strand, item}].pairID()});
-    else
-        for (int item = id2.baseID()+1; item < id1.baseID(); ++item)
-            ids.push_back({{strand, item}, _nucleotide[{strand, item}].pairID()});
-
-    return Edge({a, b}, {c, d}, {id1, id2}, false, ids);
-}
 

@@ -18,3 +18,25 @@ void Origami::testInput() {
 
     myfile.close();
 }
+
+void Origami::testhbpAssign() {
+    int hb, hbold, hbp;
+    ID id, idleft, idright;
+
+    std::ofstream myfile;
+    myfile.open ("test2.txt");
+    for (int i = 0; i < _strandNum; i++) {
+        vector<int> strand = _breaksOnEachStand[i];
+
+        for (int item = strand.size()-1; item >=0; --item) {
+            id = {i,strand[item]};
+            hbp = _axialDiscons.findIndexFromID(id);
+            myfile << id << "\t" << _nucleotide[id].pairID() << "\t" <<
+            (_axialDiscons.findTypeFromIndex(hbp).is_typeA() &&
+             _axialDiscons.findTypeFromIndex(hbp).is_typeB()) << endl;
+        }
+
+    }
+    myfile.close();
+
+}

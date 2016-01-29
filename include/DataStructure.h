@@ -174,42 +174,25 @@ class Edge {
 
 public:
     Edge() {}
-    Edge(const std::pair<int, int> &_endsNode, const std::pair<int, int> &_types, const std::pair<ID, ID> &_endsHB,
-         bool _crossover, const std::vector<std::pair<ID, ID>> &_ids)
+    Edge(const std::pair<int, int> &_endsNode, const std::pair<int, int> &_types,
+         const std::pair<ID, ID> &_endsHB, bool _crossover,
+         const std::vector<std::pair<ID, ID>> &_ids)
             : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover), _ids(_ids)
     {
         _ds = _types.first==1&&_types.second==1;
         _stretchConstant = _ds ? STRETCH_DS : STRETCH_SS;
     }
 
-    Edge(const std::pair<ID, ID> &_endsHB, bool _crossover) :
-            _endsHB(_endsHB), _crossover(_crossover) {}
-
-
     size_t length() const { return _ids.size(); }
     double get_stretchConstant() const { return _stretchConstant; }
-    void set_stretchConstant(double _stretchConstant) { Edge::_stretchConstant = _stretchConstant; }
     const std::pair<int, int> &get_endsNode() const { return _endsNode; }
     void set_endsNode(const std::pair<int, int> &_endsNode) { Edge::_endsNode = _endsNode; }
     const std::pair<int, int> &get_types() const { return _types; }
     void set_types(const std::pair<int, int> &_types) { Edge::_types = _types; }
     const std::pair<ID, ID> &get_endsHB() const { return _endsHB; }
-    void set_endsHB(const std::pair<ID, ID> &_endsHB) { Edge::_endsHB = _endsHB; }
     bool is_ds() const { return _ds; }
-    void set_ds(bool _ds) { Edge::_ds = _ds; }
     bool is_crossover() const { return _crossover; }
-
-    void set_crossover(bool _crossover) {
-        Edge::_crossover = _crossover;
-    }
-
-    const std::vector<std::pair<ID, ID>> &get_ids() const {
-        return _ids;
-    }
-
-    void set_ids(const std::vector<std::pair<ID, ID>> &_ids) {
-        Edge::_ids = _ids;
-    }
+    const std::vector<std::pair<ID, ID>> &get_ids() const { return _ids; }
 
 };
 
@@ -291,20 +274,6 @@ public:
         for (const auto &item : eg.get_ids()) {
             if (item.first.baseID() != -1) _index[item.first] = _size;
             if (item.second.baseID() != -1) _index[item.second] = _size;
-        }
-    }
-    void update(Nodes &_nodes) {
-        int a, b, c, d;
-        ID id1, id2;
-        Edge edge;
-        for (auto && item : _member) {
-            edge = item.second;
-            a = _nodes.findIndexFromID(edge.get_endsHB().first);
-            b = _nodes.findIndexFromID(edge.get_endsHB().second);
-            edge.set_endsNode({a, b});
-            c = _nodes.findTypeFromID(edge.get_endsHB().first).get_type();
-            d = _nodes.findTypeFromID(edge.get_endsHB().second).get_type();
-            edge.set_types({c, d});
         }
     }
 };
