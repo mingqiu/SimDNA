@@ -138,7 +138,8 @@ vector<pair<ID, ID>> Origami::makeHBPs() {
         for (auto item = 1; item < strand.size()-1; ++item) {
 
             id = {i, strand[item]};
-
+            if (id.baseID() == 37&& id.strandID()==13)
+                cout << endl;
             if (!_nucleotide[id].withPair()) {
                 _helicalBreakPairs.insert({id, {-1, -1}}, false, false, true);
                 continue;
@@ -152,6 +153,7 @@ vector<pair<ID, ID>> Origami::makeHBPs() {
                     _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
                                               false, true, false);
                     crossovers.push_back({idleft, id});
+                    continue;
                 }
 
                 if ((idright.baseID() - id.baseID()) == 1) {
@@ -313,8 +315,6 @@ Node Origami::makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2) {
     std::vector<std::pair<ID,ID>> ids;
     ids.push_back(pair1.get_ids());
     ids.push_back(pair2.get_ids());
-    if (pair1.get_ids().first.baseID()==2501||pair1.get_ids().second.baseID()==2501)
-        cout << endl;
     double mass = 2 * MASS;
     Vector3Dd position = (helicalCenter(pair1.get_ids().first)
                          + helicalCenter(pair2.get_ids().first)) * 0.5;

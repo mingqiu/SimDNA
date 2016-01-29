@@ -277,8 +277,6 @@ public:
         if (!this->idExists(nd.get_ids()[0].first)) {
 
             ++_size;
-            if (_size==1099)
-                std::cout << std::endl;
             nd.set_num(_size);
             _member[_size] = nd;
             for (const auto & item : nd.get_ids()) {
