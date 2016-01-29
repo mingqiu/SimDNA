@@ -41,8 +41,8 @@ class Origami {
 
 
 
-// Initialized when function makeHBPs() is invoked
-    HelicalBreakPairs _helicalBreakPairs;
+// Initialized when function makeDiscontinuity() is invoked
+    AxialDiscons _axialDiscons;
 
 
     OrigamiGraph _graph;
@@ -51,10 +51,14 @@ class Origami {
 
 public:
     Origami(std::string s);
-    std::vector<std::pair<ID, ID>> makeHBPs();
+/*
+ * Identify the type of all axial discontinuities and initialize _axialDiscons
+ */
+    std::vector<std::pair<ID, ID>> makeDiscontinuity();
     void processNodes(); // insert nodes into _graph
     void processCrossovers(std::vector<std::pair<ID, ID>> crossovers);
     void connecting();
+    void toPDB(std::string str);
 
 
 
@@ -68,20 +72,38 @@ private:
     bool input();
 /*
  * Examine whether a residue is at helical break
+ *
+ * Tell if ID{strandOld, baseOld} belongs to helical break
+ *
+ * the connectivity is
+ * 5' --> {oldold}    --      {strandOld, baseOld}    --     {strand, base}     --> 3'
+ * 3' <-- {oldoldCom} -- {pairStrandOld, pairPaseOld} -- {pairStrand, pairBase} <-- 5'
+ *
+ * The detecting process recognizes an ID to belong to helical break if it doesn't belong to
+ *   in ds
+ *      1) it has complementary base,
+ *      & 2) it has both 3' and 5' neighbors,
+ *      & 3) both its 3' and 5' neighbors have complementary, and
+ *      & 4) all three complementarity are on the same strand
+ *   in ss
+ *      1) it has both 3' and 5' neighbors
+ *      & 2) both of its 3' and 5' neighbors are single nucleotides
+ *
+ *
  */
-    bool isBreak(int, int, int, int, int, int, int, int);
+    bool isDiscontinuity(int, int, int, int, int, int, int, int);
 /*
  * Collect all ID belonging to helical break into _breaksOnEachStand
  */
     void makeHB(int strand, int base);
 
 
-/****** Useful functions  *****/
+
+    /****** Useful functions  *****/
     Vector3Dd helicalCenter(ID id1);
-    Node makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2);
-    Node makeNode(HelicalBreakPair pair1);
+    Node makeNode(AxialDiscontinuity pair1, AxialDiscontinuity pair2);
+    Node makeNode(AxialDiscontinuity pair1);
     Edge makeEdgeCrossover(ID id1, ID id2);
-    Edge makeEdge(int node1, int node2);
     Edge makeEdge(ID id1, ID id2);
 
 
@@ -89,11 +111,6 @@ private:
 
     void testInput();
     void testhbpAssign();
-
-
-public:
-
-    void toPDB(std::string str);
 
 };
 

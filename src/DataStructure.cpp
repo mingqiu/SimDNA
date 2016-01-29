@@ -10,7 +10,7 @@ std::ostream& operator<<(std::ostream& os, const ID & idnum) {
     return os;
 }
 
-std::ostream &operator<<(std::ostream &os, const HelicalBreakPair &hbp) {
+std::ostream &operator<<(std::ostream &os, const AxialDiscontinuity &hbp) {
     os << hbp.get_ids().first << "\t" << hbp.get_ids().second << "\t"
     << (hbp.is_typeA()&&hbp.is_typeB()) << "\t" << hbp.is_single() << endl;
     return os;
@@ -19,7 +19,6 @@ std::ostream &operator<<(std::ostream &os, const HelicalBreakPair &hbp) {
 
 
 void OrigamiGraph::insertEdge(Edge eg, int c1, int c2) {
-
     if (!findEdge(c1, c2)) {
         _edges.insert(eg);
         _origamiGraph[c1].push_back(c2);
@@ -28,18 +27,8 @@ void OrigamiGraph::insertEdge(Edge eg, int c1, int c2) {
 }
 
 bool OrigamiGraph::findEdge(int id1, int id2) const {
-    int match;
-    std::vector<int> toCheck;
-    if (_origamiGraph[id1].size()>_origamiGraph[id2].size()) {
-        toCheck = _origamiGraph[id2];
-        match = id1;
-    }
-    else {
-        toCheck = _origamiGraph[id1];
-        match = id2;
-    }
-    for (auto it : toCheck) {
-        if (it==match) { return true;}
+    for (const auto &it : _origamiGraph[id1]) {
+        if (it==id2) { return true;}
     }
     return false;
 }

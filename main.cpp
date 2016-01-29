@@ -4,10 +4,10 @@
 using namespace std;
 
 int main() {
-    Origami aOrigami = {"/Users/mingqiuwang/Workspace/DNAOrigami/JunctionDetect4DNAOrigami/test/" +
+    Origami aOrigami = {"/Users/mingqiuwang/Workspace/DNAOrigami/TestCases/" +
                         inputJsonFileName + '.' + "pairs"};
 
-    vector<pair<ID, ID>> crossovers = aOrigami.makeHBPs();
+    vector<pair<ID, ID>> crossovers = aOrigami.makeDiscontinuity();
     aOrigami.processNodes();
     aOrigami.processCrossovers(crossovers);
     aOrigami.connecting();

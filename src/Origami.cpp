@@ -33,8 +33,8 @@ bool Origami::input() {
     for (int i = 1; i < _totalResidueNum; ++i) {
         input >> strand >> base >> x >> y >> z >> pairStrand >> pairBase;
 
-        isABreak = isBreak(strand, base, pairStrand, pairBase,
-                           strandOld, baseOld, pairStrandOld, pairBaseOld);
+        isABreak = isDiscontinuity(strand, base, pairStrand, pairBase,
+                                   strandOld, baseOld, pairStrandOld, pairBaseOld);
         _nucleotide[ ID{strandOld, baseOld} ] =
                 Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld, yOld, zOld},
                             ID{pairStrandOld, pairBaseOld}, isABreak};
@@ -67,81 +67,20 @@ bool Origami::input() {
     return true;
 }
 
-/*
- * Tell if ID{strandOld, baseOld} belongs to helical break
- *
- * the connectivity is
- * 5' --> {oldold}    --      {strandOld, baseOld}    --     {strand, base}     --> 3'
- * 3' <-- {oldoldCom} -- {pairStrandOld, pairPaseOld} -- {pairStrand, pairBase} <-- 5'
- *
- * The detecting process recognizes an ID to belong to helical break if it doesn't belong to
- *   in ds
- *      1) it has complementary base,
- *      & 2) it has both 3' and 5' neighbors,
- *      & 3) both its 3' and 5' neighbors have complementary, and
- *      & 4) all three complementarity are on the same strand
- *   in ss
- *      1) it has both 3' and 5' neighbors
- *      & 2) both of its 3' and 5' neighbors are single nucleotides
- *
- * */
-
-bool Origami::isBreak(int strand, int base, int pairStrand, int pairBase,
-                      int strandOld, int baseOld, int pairStrandOld, int pairBaseOld) {
-
-    if (base == 2 || base == 1) return true; // starting and ending residues are breaks
-
-    // with the judge above, below baseOld is at least 2.
-    ID oldoldCom = _nucleotide[ID{strandOld, baseOld - 1}].pairID();
-    if (pairStrand != pairStrandOld) return true; // changed strand
-    if (oldoldCom.strandID() != pairStrandOld) return true; // changed strand
-
-    // if double strand
-    if (pairBaseOld != -1) {
-        if (!((pairBase - pairBaseOld) == 1 || (pairBase - pairBaseOld) == -1)) return true; // changed base
-        if (!((oldoldCom.baseID() - pairBaseOld) == 1 || (oldoldCom.baseID() - pairBaseOld) == -1)) return true; // changed base
-
-    }
-    // if single strand
-    else {
-        if (_nucleotide[ID{strandOld, baseOld - 1}].withPair()) return true;
-        if (pairBase != -1 ) return true;
-
-    }
-    return false;
-}
-
-
-void Origami::makeHB(int strand, int base) {
-    if (_breaksOnEachStand.find(strand) == _breaksOnEachStand.end()) {
-        vector<int> thisStrand;
-        thisStrand.push_back(base);
-        _breaksOnEachStand[strand] = thisStrand;
-    }
-    else
-        _breaksOnEachStand[strand].push_back(base);
-}
-
-
-vector<pair<ID, ID>> Origami::makeHBPs() {
-    std::cout << "Step 2: Helical break pairs generating \n";
+vector<pair<ID, ID>> Origami::makeDiscontinuity() {
+    std::cout << "Step 2: Axial discountinuities generating \n";
 
     ID id, idleft, idright;
-
     vector<pair<ID, ID>> crossovers;
 
     for (int i = 0; i < _strandNum; i++) {
-
-
         vector<int> strand = _breaksOnEachStand[i];
-
         for (auto item = 1; item < strand.size()-1; ++item) {
-
             id = {i, strand[item]};
-            if (id.baseID() == 37&& id.strandID()==13)
-                cout << endl;
+
+            // if belongs to single strand
             if (!_nucleotide[id].withPair()) {
-                _helicalBreakPairs.insert({id, {-1, -1}}, false, false, true);
+                _axialDiscons.insert({id, {-1, -1}}, false, false, true);
                 continue;
             }
 
@@ -149,49 +88,49 @@ vector<pair<ID, ID>> Origami::makeHBPs() {
             idright = {i, strand[item+1]};
 
             if ((id.baseID() - idleft.baseID()) == 1) {
-                if (dist(helicalCenter(idleft), helicalCenter(id))>18) {
-                    _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                              false, true, false);
+                if (dist(helicalCenter(idleft), helicalCenter(id))>CROSSOVER_DIS) {
+                    _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                         false, true, false);
                     crossovers.push_back({idleft, id});
                     continue;
                 }
 
                 if ((idright.baseID() - id.baseID()) == 1) {
-                    if (dist(helicalCenter(idright), helicalCenter(id))>10) {
-                        _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                                  false, true, false);
+                    if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
+                        _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                             false, true, false);
                         crossovers.push_back({idright, id});
 
                     }
                     else {
-                        _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                                  _nucleotide[idright].withPair(), false, false);
+                        _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                             _nucleotide[idright].withPair(), false, false);
 
                     }
                     continue;
                 }
 
 
-                else _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                               true, false, false);
+                else _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                          true, false, false);
                 continue;
             }
             if ((idright.baseID() - id.baseID()) == 1) {
                 if (dist(helicalCenter(idright), helicalCenter(id))>10) {
-                    _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                              false, true, false);
+                    _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                         false, true, false);
                     crossovers.push_back({idright, id});
 
                 }
                 else {
-                    _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                              _nucleotide[idright].withPair(), false, false);
+                    _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                         _nucleotide[idright].withPair(), false, false);
 
                 }
                 continue;
             }
-            _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                      false, false, false);
+            _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                 false, false, false);
 
         }
 
@@ -199,45 +138,45 @@ vector<pair<ID, ID>> Origami::makeHBPs() {
         idright = {i, strand[1]};
 
         if (!_nucleotide[id].withPair()) {
-            _helicalBreakPairs.insert({id, {-1, -1}}, false, false, true);
+            _axialDiscons.insert({id, {-1, -1}}, false, false, true);
         }
 
         else if ((idright.baseID() - id.baseID()) == 1) {
             if (dist(helicalCenter(idright), helicalCenter(id))>10) {
-                _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                          false, true, false);
+                _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                     false, true, false);
                 crossovers.push_back({idright, id});
 
             }
 
-            else _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                           _nucleotide[idright].withPair(), false, false);
+            else _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                      _nucleotide[idright].withPair(), false, false);
         }
         else
-        _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                  false, false, false);
+        _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                             false, false, false);
 
 
         id = {i, strand[strand.size()-1]};
         idleft = {i, strand[strand.size()-2]};
 
         if (!_nucleotide[id].withPair()) {
-            _helicalBreakPairs.insert({id, {-1, -1}}, false, false, true);
+            _axialDiscons.insert({id, {-1, -1}}, false, false, true);
         }
 
         else if ((id.baseID() - idleft.baseID()) == 1) {
             if (dist(helicalCenter(idleft), helicalCenter(id))>10) {
-                _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                          false, true, false);
+                _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                     false, true, false);
                 crossovers.push_back({idleft, id});
 
             }
-            else _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                           true, false, false);
+            else _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                      true, false, false);
         }
         else
-            _helicalBreakPairs.insert({id, _nucleotide[id].pairID()},
-                                      false, false, false);
+            _axialDiscons.insert({id, _nucleotide[id].pairID()},
+                                 false, false, false);
     }
 
     std::cout << "................ DONE\n";
@@ -251,29 +190,29 @@ void Origami::processNodes() {
     std::cout << "Step 3: Nodes generating \n";
 
     int hb, hbold;
-    HelicalBreakPair hbp, hbpold;
+    AxialDiscontinuity hbp, hbpold;
     for (int i = 0; i < _strandNum; i++) {
         vector<int> strand = _breaksOnEachStand[i];
         hb = strand[0];
-        hbp = _helicalBreakPairs.findTypeFromID({i,hb});
+        hbp = _axialDiscons.findTypeFromID({i, hb});
         for (int item = 1; item < strand.size(); ++item) {
             hbold = hb;
             hb = strand[item];
             hbpold = hbp;
-            hbp = _helicalBreakPairs.findTypeFromID({i,hb});
+            hbp = _axialDiscons.findTypeFromID({i, hb});
             if ((hb - hbold)==1) {
-                if (HelicalBreakPair::similar(hbpold, hbp) && hbp.is_typeA() ) {
+                if (AxialDiscontinuity::similar(hbpold, hbp) && hbp.is_typeA() ) {
                     if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold}))>10&& hbp.is_typeB()) {
                         if (item == strand.size() - 1) break;
                         hb = strand[item + 1];
-                        hbp = _helicalBreakPairs.findTypeFromID({i, hb});
+                        hbp = _axialDiscons.findTypeFromID({i, hb});
                         ++item;
                         continue;
                     }
                     _graph.insertNode(makeNode(hbpold, hbp));
                     if (item == strand.size() - 1) break;
                     hb = strand[item + 1];
-                    hbp = _helicalBreakPairs.findTypeFromID({i, hb});
+                    hbp = _axialDiscons.findTypeFromID({i, hb});
                     ++item;
                     continue;
                 }
@@ -299,10 +238,10 @@ void Origami::testhbpAssign() {
 
         for (int item = strand.size()-1; item >=0; --item) {
             id = {i,strand[item]};
-            hbp = _helicalBreakPairs.findIndexFromID(id);
+            hbp = _axialDiscons.findIndexFromID(id);
             myfile << id << "\t" << _nucleotide[id].pairID() << "\t" <<
-            (_helicalBreakPairs.findTypeFromIndex(hbp).is_typeA()&&
-                    _helicalBreakPairs.findTypeFromIndex(hbp).is_typeB()) << endl;
+            (_axialDiscons.findTypeFromIndex(hbp).is_typeA() &&
+             _axialDiscons.findTypeFromIndex(hbp).is_typeB()) << endl;
         }
 
     }
@@ -310,7 +249,7 @@ void Origami::testhbpAssign() {
 
 }
 
-Node Origami::makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2) {
+Node Origami::makeNode(AxialDiscontinuity pair1, AxialDiscontinuity pair2) {
     int type = 1;
     std::vector<std::pair<ID,ID>> ids;
     ids.push_back(pair1.get_ids());
@@ -324,7 +263,7 @@ Node Origami::makeNode(HelicalBreakPair pair1, HelicalBreakPair pair2) {
 
 }
 
-Node Origami::makeNode(HelicalBreakPair pair) {
+Node Origami::makeNode(AxialDiscontinuity pair) {
     int type = pair.is_single() ? 3 : 2;
     std::vector<std::pair<ID,ID>> ids;
     ids.push_back(pair.get_ids());

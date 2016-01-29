@@ -13,7 +13,7 @@ void Origami::testInput() {
     for (auto strand = 0; strand < _strandNum; ++strand)
         for (auto base = _resNumInEachStrand[strand]; base >=1 ; --base) {
             auto a = _nucleotide[{strand, base}];
-            if (a.isBreak()) myfile << a.id() << endl;
+            if (a.isDiscont()) myfile << a.id() << endl;
         }
 
     myfile.close();
