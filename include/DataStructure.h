@@ -131,6 +131,7 @@ class Node {
     double _mass;
     Vector3Dd _position;
     double _vdWradii;
+    bool _inHJ; // whether in a Holliday junction
 
 public:
 
@@ -152,14 +153,15 @@ public:
     void set_position(const Vector3Dd &_position) { Node::_position = _position; }
     double get_vdWradii() const { return _vdWradii; }
     void set_vdWradii(double _vdWradii) { Node::_vdWradii = _vdWradii; }
-
-
+    bool is_inHJ() const { return _inHJ; }
+    void set_inHJ(bool _inHJ) { Node::_inHJ = _inHJ; }
 };
 
 
 
 /*
  * Basic unit used in the simulation
+ *
  *
  * */
 class Edge {
@@ -169,6 +171,7 @@ class Edge {
 
     bool _ds; // whether is double strand
     bool _crossover; // whether is a crossover
+    bool _isHJ; // whether is a Holliday junction
     std::vector<std::pair<ID,ID>> _ids;
     double _stretchConstant;
 
@@ -193,7 +196,8 @@ public:
     bool is_ds() const { return _ds; }
     bool is_crossover() const { return _crossover; }
     const std::vector<std::pair<ID, ID>> &get_ids() const { return _ids; }
-
+    bool is_isHJ() const { return _isHJ; }
+    void set_isHJ(bool _isHJ) { Edge::_isHJ = _isHJ; }
 };
 
 /*
@@ -217,6 +221,7 @@ public:
 
     int size() {return _size;}
     const std::unordered_map<int, T> &member() const { return _member;}
+    std::unordered_map<int, T> &updateMember() { return _member;}
     const std::unordered_map<ID, int, IDHasher> &index() const { return _index;}
 
     int idExists(ID id) const {
@@ -284,6 +289,9 @@ class OrigamiGraph {
     Nodes _nodes;
     Edges _edges;
     std::vector<std::vector<int>> _origamiGraph;
+    int _numHJ; // how many Holliday junctions
+    std::vector<Edge> _HJ;
+    std::vector<Edge> _crossovers;
 
 public:
 
@@ -294,44 +302,26 @@ public:
     int findNodeType(ID id);
     int findNodeType(int a);
     int findNodeNum(ID id);
+    const std::vector<std::pair<ID, ID>> &findIDsfromIndex(int a);
     const std::vector<std::vector<int>>& showGraph() const { return _origamiGraph; }
     int howManyNodes() { return _nodes.size();}
     Vector3Dd nodeCenter(int a) { return _nodes.findTypeFromIndex(a).get_position();}
+    const Edges &get_edges() const { return _edges; }
+    const Nodes &get_nodes() const { return _nodes; }
+    const std::vector<Edge> &get_HJ() const { return _HJ; }
+    const std::vector<Edge> &get_crossovers() const { return _crossovers; }
+    const std::vector<int> connectFrom(int a) const { return _origamiGraph[a]; }
+
     void printAllNodes() {
         for (auto && item :_nodes.member())
             for (auto && item1 : item.second.get_ids())
                 std::cout << item1.first << "\t" << item1.second << std::endl;
     }
 
-    void howManyFourWays() {
-        Edge edge;
-        int sum = 0;
-        int a, b;
-        ID id;
-        for (const auto& item : _edges.member()) {
-            edge = item.second;
-            if (edge.get_types().first == 1 && edge.get_types().second == 1 && edge.is_crossover()) {
-                ++sum;
-
-                a = edge.get_endsNode().first;
-                b = edge.get_endsNode().second;
-
-//                for (int item1=0; item1 < _nodes.findTypeFromIndex(a).get_ids().size(); ++item1) {
-//                    id = _nodes.findTypeFromIndex(a).get_ids()[item1].first;
-//                    std::cout << id << std::endl;
-//                    id = _nodes.findTypeFromIndex(a).get_ids()[item1].second;
-//                    std::cout << id << std::endl;
-//                    id = _nodes.findTypeFromIndex(b).get_ids()[item1].first;
-//                    std::cout << id << std::endl;
-//                    id = _nodes.findTypeFromIndex(b).get_ids()[item1].second;
-//                    std::cout << id << std::endl;
-//                }
-
-            }
-        }
-        std::cout << sum << std::endl;
-
-    }
+/*
+ * Find all Holliday junctions, complete _nodes and _edges
+ * */
+    void findHollidayJ();
 
 };
 

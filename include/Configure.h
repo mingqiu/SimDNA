@@ -16,7 +16,11 @@ const std::string inputJsonFileName = "A_2D";
 #define MASS 649 // (g/mol)
 #define STRETCH_DS 1 // (pN/nm)
 #define STRETCH_SS 0.1 // (pN/nm)
-#define CROSSOVER_DIS 18 // (A) if two neighbor bps are seperated by this distance, it's a crossover
+#define ANGLE_W 0.1
+#define ANGLE_S 1.0
+#define THRES_CROSSOVER_DIS 18 // (A) if two neighbor bps are seperated by this distance, it's a crossover
+#define CROSSOVER_DIS 22 // (A) equilibrium length of a crossover
+#define RISE_PER_BP 3.32 // (A) helical rise per bp
 #define VDWRADII_1 1 // (nm) vdw radii of type 1# node
 #define VDWRADII_2 0.2 // (nm) vdw radii of type 2# node
 #define VDWRADII_3 1.2 // (nm) vdw radii of type 3# node

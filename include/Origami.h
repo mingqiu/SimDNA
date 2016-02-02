@@ -41,11 +41,12 @@ class Origami {
 
 
 
-// Initialized when function makeDiscontinuity() is invoked
+// Initialized when function identifyDiscontinuity() is invoked
     AxialDiscons _axialDiscons;
 
 // Initialized when function processNodes, processCrossovers, connecting are invoked
     OrigamiGraph _graph;
+
 
 
 
@@ -54,7 +55,7 @@ public:
 /*
  * Identify the type of all axial discontinuities and initialize _axialDiscons
  */
-    std::vector<std::pair<ID, ID>> makeDiscontinuity();
+    std::vector<std::pair<ID, ID>> identifyDiscontinuity();
 /*
  * Insert nodes into _graph
  */
@@ -68,9 +69,13 @@ public:
  */
     void connecting();
 /*
- * Output PDB file
+ * Output PDB and XML file
  */
     void toPDB(std::string str);
+    void toXML(std::string str);
+
+
+
 
 
 
@@ -136,6 +141,12 @@ private:
 
     void testInput();
     void testhbpAssign();
+
+public:
+    void toIDs(int i) {
+        for (const auto & item : _graph.findIDsfromIndex(i))
+            std::cout << item.first << "\t" << item.second << std::endl;
+    }
 
 };
 

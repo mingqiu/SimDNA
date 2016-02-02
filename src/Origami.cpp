@@ -67,7 +67,7 @@ bool Origami::input() {
     return true;
 }
 
-vector<pair<ID, ID>> Origami::makeDiscontinuity() {
+vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
     std::cout << "Step 2: Axial discontinuities generating \n";
 
     ID id, idleft, idright;
@@ -90,14 +90,14 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
 // if belongs to double strand
             // if it has a left neighbor discontinuity
             if ((id.baseID() - idleft.baseID()) == 1) {
-                if (dist(helicalCenter(idleft), helicalCenter(id))>CROSSOVER_DIS) {
+                if (dist(helicalCenter(idleft), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          false, true, false);
                     crossovers.push_back({idleft, id});
                     continue;
                 }
                 if ((idright.baseID() - id.baseID()) == 1) {
-                    if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
+                    if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                         _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                              false, true, false);
                         crossovers.push_back({idright, id});
@@ -114,7 +114,7 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
 
             // if it has a right neighbor discontinuity
             if ((idright.baseID() - id.baseID()) == 1) {
-                if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
+                if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          false, true, false);
                     crossovers.push_back({idright, id});
@@ -135,7 +135,7 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
             _axialDiscons.insert({id, {-1, -1}}, false, false, true);
 
         else if ((idright.baseID() - id.baseID()) == 1) {
-            if (dist(helicalCenter(idright), helicalCenter(id))>CROSSOVER_DIS) {
+            if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);
                 crossovers.push_back({idright, id});
@@ -151,7 +151,7 @@ vector<pair<ID, ID>> Origami::makeDiscontinuity() {
 
         if (!_nucleotide[id].withPair()) _axialDiscons.insert({id, {-1, -1}}, false, false, true);
         else if ((id.baseID() - idleft.baseID()) == 1) {
-            if (dist(helicalCenter(idleft), helicalCenter(id))>CROSSOVER_DIS) {
+            if (dist(helicalCenter(idleft), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);
                 crossovers.push_back({idleft, id});
@@ -187,9 +187,11 @@ void Origami::processNodes() {
             hb = strand[item];
             hbpold = hbp;
             hbp = _axialDiscons.findTypeFromID({i, hb});
+            if (i==41&&hbold==21)
+                cout << endl;
             if ((hb - hbold)==1) {
                 if (AxialDiscontinuity::similar(hbpold, hbp) && hbp.is_typeA() ) {
-                    if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold}))>CROSSOVER_DIS&& hbp.is_typeB()) {
+                    if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold})) > THRES_CROSSOVER_DIS && hbp.is_typeB()) {
                         if (item == strand.size() - 1) break;
                         hb = strand[item + 1];
                         hbp = _axialDiscons.findTypeFromID({i, hb});
@@ -252,8 +254,13 @@ void Origami::connecting() {
 
     std::cout << "................ DONE\n";
 
-}
 
+    std::cout << "Step 6: Holliday junctions identifying \n";
+    _graph.findHollidayJ();
+
+    std::cout << "................ DONE\n";
+
+}
 
 
 
