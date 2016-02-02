@@ -142,11 +142,13 @@ private:
     void testInput();
     void testhbpAssign();
 
+
 public:
     void toIDs(int i) {
         for (const auto & item : _graph.findIDsfromIndex(i))
             std::cout << item.first << "\t" << item.second << std::endl;
     }
+    void test() { std::cout << _graph.howMany4Ways() << std::endl;}
 
 };
 

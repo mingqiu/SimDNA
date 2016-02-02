@@ -15,8 +15,8 @@ int main() {
                    inputJsonFileName + '.' + "pdb");
     aOrigami.toXML("/Users/mingqiuwang/Workspace/DNAOrigami/SimDNA/results/Debug/" +
                    inputJsonFileName + '.' + "xml");
-    aOrigami.toIDs(191);
-    aOrigami.toIDs(266);
+//    aOrigami.test();
+
 
     return 0;
 }

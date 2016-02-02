@@ -268,6 +268,29 @@ public:
                 if (item.second.baseID() != -1) _index[item.second] = _size;
             }
         }
+        else {
+            if (this->findTypeFromID(nd.get_ids()[0].first).get_type()==2 &&nd.get_type()==1) {
+                int size1 = this->findIndexFromID(nd.get_ids()[0].first);
+                int size2 = this->findIndexFromID(nd.get_ids()[1].first);
+
+                nd.set_num(size1);
+                _member[size1] = nd;
+                for (const auto & item : nd.get_ids()) {
+                    if (item.first.baseID() != -1) _index[item.first] = size1;
+                    if (item.second.baseID() != -1) _index[item.second] = size1;
+                }
+                nd = _member[_size];
+
+                nd.set_num(size2);
+                _member[size2] = nd;
+                for (const auto & item : nd.get_ids()) {
+                    if (item.first.baseID() != -1) _index[item.first] = size2;
+                    if (item.second.baseID() != -1) _index[item.second] = size2;
+                }
+                _member.erase(_size);
+                --_size;
+            }
+        }
     }
 };
 
@@ -311,6 +334,7 @@ public:
     const std::vector<Edge> &get_HJ() const { return _HJ; }
     const std::vector<Edge> &get_crossovers() const { return _crossovers; }
     const std::vector<int> connectFrom(int a) const { return _origamiGraph[a]; }
+    int howMany4Ways() const { return _numHJ; }
 
     void printAllNodes() {
         for (auto && item :_nodes.member())

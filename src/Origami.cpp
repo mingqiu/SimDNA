@@ -187,8 +187,6 @@ void Origami::processNodes() {
             hb = strand[item];
             hbpold = hbp;
             hbp = _axialDiscons.findTypeFromID({i, hb});
-            if (i==41&&hbold==21)
-                cout << endl;
             if ((hb - hbold)==1) {
                 if (AxialDiscontinuity::similar(hbpold, hbp) && hbp.is_typeA() ) {
                     if (dist(helicalCenter({i, hb}), helicalCenter({i, hbold})) > THRES_CROSSOVER_DIS && hbp.is_typeB()) {
