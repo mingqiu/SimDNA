@@ -40,6 +40,26 @@ void Origami::toXML(string str) {
     if ((xml = fopen(xmlName, "w")) == NULL){ printf("\nerror on open xml file!"); exit(0); }
     fprintf(xml, "<ForceField>\n\n");
 
+
+    fprintf(xml, " <AtomTypes>\n");
+    for (const auto & item : _graph.get_nodes().member())
+
+        fprintf(xml, "  <Type name=\"%d\" class=\"C\" mass=\"%lf\"/>\n", item.second.get_num(), item.second.get_mass());
+    fprintf(xml, " </AtomTypes>\n\n");
+
+// Residues
+    fprintf(xml, " <Residues>\n");
+    fprintf(xml, "  <Residue name=\"ALL\">\n");
+    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair)
+        fprintf(xml, "   <Atom name=\"%d\" type=\"%d\"/>\n", aHelicalBreakPair, aHelicalBreakPair);
+    for (const auto &item: _graph.get_edges().member()) {
+        fprintf(xml, "   <Bond from=\"%d\" to=\"%d\"/>\n", item.second.get_endsNode().first-1, item.second.get_endsNode().second-1);
+    }
+    fprintf(xml, "  </Residue>\n");
+    fprintf(xml, " </Residues>\n\n");
+
+
+
 //
 // HarmonicBondForce
     fprintf(xml, " <HarmonicBondForce>\n");
