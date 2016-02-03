@@ -49,6 +49,15 @@ struct IDHasher {
     }
 };
 
+struct pairhash {
+public:
+    template <typename T, typename U>
+    std::size_t operator()(const std::pair<T, U> &x) const
+    {
+        return std::hash<T>()(x.first) ^ std::hash<U>()(x.second);
+    }
+};
+
 /*
  * Nucleotide information (ID, pair residue ID, coordinate, etc..)
  *
@@ -182,7 +191,7 @@ public:
          const std::vector<std::pair<ID, ID>> &_ids)
             : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover), _ids(_ids)
     {
-        _ds = _types.first==1&&_types.second==1;
+        _ds = _crossover ? _types.first == 1 && _types.second == 1 : _types.first != 3 && _types.second != 3;
         _stretchConstant = _ds ? STRETCH_DS : STRETCH_SS;
     }
 
@@ -258,52 +267,30 @@ public:
 
 class Nodes : public Index<Node> {
 public:
-    void insert(Node nd) {
-        if (!this->idExists(nd.get_ids()[0].first)) {
-            ++_size;
-            nd.set_num(_size);
-            _member[_size] = nd;
-            for (const auto & item : nd.get_ids()) {
-                if (item.first.baseID() != -1) _index[item.first] = _size;
-                if (item.second.baseID() != -1) _index[item.second] = _size;
-            }
-        }
-        else {
-            if (this->findTypeFromID(nd.get_ids()[0].first).get_type()==2 &&nd.get_type()==1) {
-                int size1 = this->findIndexFromID(nd.get_ids()[0].first);
-                int size2 = this->findIndexFromID(nd.get_ids()[1].first);
-
-                nd.set_num(size1);
-                _member[size1] = nd;
-                for (const auto & item : nd.get_ids()) {
-                    if (item.first.baseID() != -1) _index[item.first] = size1;
-                    if (item.second.baseID() != -1) _index[item.second] = size1;
-                }
-                nd = _member[_size];
-
-                nd.set_num(size2);
-                _member[size2] = nd;
-                for (const auto & item : nd.get_ids()) {
-                    if (item.first.baseID() != -1) _index[item.first] = size2;
-                    if (item.second.baseID() != -1) _index[item.second] = size2;
-                }
-                _member.erase(_size);
-                --_size;
-            }
-        }
-    }
+    void insert(Node nd);
 };
 
 class Edges : public Index<Edge> {
+    std::unordered_map<std::pair<int, int>, int, pairhash> _indexEdge;
 public:
     void insert(Edge eg) {
         ++_size;
         _member[_size] = eg;
+        _indexEdge[eg.get_endsNode()] = _size;
         for (const auto &item : eg.get_ids()) {
             if (item.first.baseID() != -1) _index[item.first] = _size;
             if (item.second.baseID() != -1) _index[item.second] = _size;
         }
     }
+    const Edge &findEdgeFromEnds(int a, int b) const {
+
+
+        auto v = _indexEdge.find({a, b});
+        if ( v == _indexEdge.end()) return _member.at(_indexEdge.at({b, a}));
+        else return _member.at(v->second);
+
+    }
+
 };
 
 
@@ -335,6 +322,10 @@ public:
     const std::vector<Edge> &get_crossovers() const { return _crossovers; }
     const std::vector<int> connectFrom(int a) const { return _origamiGraph[a]; }
     int howMany4Ways() const { return _numHJ; }
+    const Edge &findEdgeFromEnds(int a, int b) const {
+        return _edges.findEdgeFromEnds(a, b);
+
+    }
 
     void printAllNodes() {
         for (auto && item :_nodes.member())

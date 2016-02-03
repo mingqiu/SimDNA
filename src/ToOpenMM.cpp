@@ -109,7 +109,6 @@ void Origami::toXML(string str) {
                 a2, a, b, 1.57, ANGLE_S);
 
     }
-    fprintf(xml, " </HarmonicAngleForce>\n\n");
 
 // Dihedral Force
 //    fprintf(xml, " <PeriodicTorsionForce>\n");
@@ -142,6 +141,34 @@ void Origami::toXML(string str) {
 //    }
 
 
+
+    int i;
+    Edge edge1, edge2;
+    int edge1index, edge2index;
+    for (const auto &item2 : _graph.get_nodes().member()) {
+        if (item2.second.is_inHJ()) continue;
+        if (item2.second.get_type()==3) continue;
+        i = item2.second.get_num();
+        if (_graph.showGraph()[i].size()==1) continue;
+
+
+        for (int a = 0; a < _graph.showGraph()[i].size(); ++a)
+            for (int b = a; b < _graph.showGraph()[i].size(); ++b) {
+                if (a==b) continue;
+                edge1index = _graph.showGraph()[i][a];
+                edge2index = _graph.showGraph()[i][b];
+                edge1 = _graph.findEdgeFromEnds(i, edge1index);
+                edge2 = _graph.findEdgeFromEnds(i, edge2index);
+                if (edge1.is_ds()&&edge2.is_ds())
+                    fprintf(xml, "  <Angle type1=\"%d\" type2=\"%d\" type3=\"%d\" angle=\"%lf\" k=\"%lf\"/>\n",
+                            edge1index, i, edge2index, 3.14, ANGLE_W);
+                else if ((edge1.is_crossover()&&edge2.is_ds())||(edge2.is_crossover()&&edge1.is_ds()))
+                    fprintf(xml, "  <Angle type1=\"%d\" type2=\"%d\" type3=\"%d\" angle=\"%lf\" k=\"%lf\"/>\n",
+                            edge1index, i, edge2index, 1.57, ANGLE_W);
+            }
+    }
+
+    fprintf(xml, " </HarmonicAngleForce>\n\n");
 
 
 

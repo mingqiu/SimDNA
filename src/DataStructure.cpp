@@ -72,3 +72,39 @@ void OrigamiGraph::findHollidayJ() {
     _numHJ = sum;
 
 }
+
+
+void Nodes::insert(Node nd) {
+    if (!this->idExists(nd.get_ids()[0].first)) {
+        ++_size;
+        nd.set_num(_size);
+        _member[_size] = nd;
+        for (const auto & item : nd.get_ids()) {
+            if (item.first.baseID() != -1) _index[item.first] = _size;
+            if (item.second.baseID() != -1) _index[item.second] = _size;
+        }
+    }
+    else {
+        if (this->findTypeFromID(nd.get_ids()[0].first).get_type()==2 &&nd.get_type()==1) {
+            int size1 = this->findIndexFromID(nd.get_ids()[0].first);
+            int size2 = this->findIndexFromID(nd.get_ids()[1].first);
+
+            nd.set_num(size1);
+            _member[size1] = nd;
+            for (const auto & item : nd.get_ids()) {
+                if (item.first.baseID() != -1) _index[item.first] = size1;
+                if (item.second.baseID() != -1) _index[item.second] = size1;
+            }
+            nd = _member[_size];
+
+            nd.set_num(size2);
+            _member[size2] = nd;
+            for (const auto & item : nd.get_ids()) {
+                if (item.first.baseID() != -1) _index[item.first] = size2;
+                if (item.second.baseID() != -1) _index[item.second] = size2;
+            }
+            _member.erase(_size);
+            --_size;
+        }
+    }
+}
