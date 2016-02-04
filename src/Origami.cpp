@@ -67,16 +67,19 @@ bool Origami::input() {
     return true;
 }
 
-vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
+void Origami::identifyDiscontinuity() {
     std::cout << "Step 2: Axial discontinuities generating \n";
 
     ID id, idleft, idright;
-    vector<pair<ID, ID>> crossovers;
 
     for (int i = 0; i < _strandNum; i++) {
         vector<int> strand = _breaksOnEachStand[i];
         for (auto item = 1; item < strand.size()-1; ++item) {
             id = {i, strand[item]};
+
+
+//            if (i==0&&strand[item]==11949)
+//                cout << endl;
 
 // if belongs to single strand
             if (!_nucleotide[id].withPair()) {
@@ -93,14 +96,14 @@ vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
                 if (dist(helicalCenter(idleft), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          false, true, false);
-                    crossovers.push_back({idleft, id});
                     continue;
                 }
                 if ((idright.baseID() - id.baseID()) == 1) {
                     if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                         _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                              false, true, false);
-                        crossovers.push_back({idright, id});
+                        _crossovers.push_back({id, idright});
+//                        cout << "test" << endl;
                     }
                     else
                         _axialDiscons.insert({id, _nucleotide[id].pairID()},
@@ -117,7 +120,8 @@ vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
                 if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          false, true, false);
-                    crossovers.push_back({idright, id});
+                    _crossovers.push_back({id, idright});
+//                    cout << "test" << endl;
                 }
                 else
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
@@ -131,6 +135,8 @@ vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
         id = {i, strand[0]};
         idright = {i, strand[1]};
 
+//        if (i == 42 && strand[0] == 1)
+//            cout << endl;
         if (!_nucleotide[id].withPair())
             _axialDiscons.insert({id, {-1, -1}}, false, false, true);
 
@@ -138,7 +144,8 @@ vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
             if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);
-                crossovers.push_back({idright, id});
+                _crossovers.push_back({id, idright});
+                if (TEST) cout << "crossover at start" << endl;
             }
             else _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                       _nucleotide[idright].withPair(), false, false);
@@ -154,7 +161,9 @@ vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
             if (dist(helicalCenter(idleft), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);
-                crossovers.push_back({idleft, id});
+                _crossovers.push_back({idleft, id});
+                if (TEST) cout << "crossover at end" << endl;
+
             }
             else _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                       true, false, false);
@@ -164,11 +173,10 @@ vector<pair<ID, ID>> Origami::identifyDiscontinuity() {
                                  false, false, false);
     }
 
+//    for (const auto & item : _crossovers)
+//        cout << item.first << "\t" << item.second << endl;
     std::cout << "................ DONE\n";
 
-//    for (const auto &item1: crossovers)
-//        cout << item1.first << "\t" << item1.second << endl;
-    return crossovers;
 
 }
 
@@ -214,12 +222,12 @@ void Origami::processNodes() {
 }
 
 
-void Origami::processCrossovers(std::vector<std::pair<ID, ID>> crossovers) {
+void Origami::processCrossovers() {
     std::cout << "Step 4: Crossovers generating \n";
 
     ID id1, id2;
     Edge edge;
-    for (const auto &cross : crossovers) {
+    for (const auto &cross : _crossovers) {
         id1 = cross.first;
         id2 = cross.second;
         edge = makeEdgeCrossover(id1, id2);

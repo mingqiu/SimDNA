@@ -18,6 +18,8 @@ const std::string inputJsonFileName = "fourhelix";
 #define STRETCH_SS 0.1 // (pN/nm)
 #define ANGLE_W 0.1
 #define ANGLE_S 1.0
+#define DIHEDRAL_S 0.1
+#define DIHEDRAL_W 0.01
 #define THRES_CROSSOVER_DIS 18 // (A) if two neighbor bps are seperated by this distance, it's a crossover
 #define CROSSOVER_DIS 2.2 // (nm) equilibrium length of a crossover
 #define RISE_PER_BP 0.332 // (nm) helical rise per bp

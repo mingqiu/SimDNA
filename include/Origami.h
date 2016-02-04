@@ -43,6 +43,7 @@ class Origami {
 
 // Initialized when function identifyDiscontinuity() is invoked
     AxialDiscons _axialDiscons;
+    std::vector<std::pair<ID, ID>> _crossovers;
 
 // Initialized when function processNodes, processCrossovers, connecting are invoked
     OrigamiGraph _graph;
@@ -54,8 +55,9 @@ public:
     Origami(std::string s);
 /*
  * Identify the type of all axial discontinuities and initialize _axialDiscons
+ * Identify crossovers and initialize _crossovers
  */
-    std::vector<std::pair<ID, ID>> identifyDiscontinuity();
+    void identifyDiscontinuity();
 /*
  * Insert nodes into _graph
  */
@@ -63,7 +65,7 @@ public:
 /*
  * Insert edges(crossovers) into _graph
  */
-    void processCrossovers(std::vector<std::pair<ID, ID>> crossovers);
+    void processCrossovers();
 /*
  * Insert edges(other than crossovers) into _graph
  */
@@ -150,9 +152,6 @@ public:
     }
     void test() {
         std::cout << _graph.howMany4Ways() << std::endl;
-        toIDs(221);
-        toIDs(222);
-
     }
 
 };
