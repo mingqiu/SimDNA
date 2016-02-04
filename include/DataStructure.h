@@ -189,7 +189,7 @@ public:
     Edge(const std::pair<int, int> &_endsNode, const std::pair<int, int> &_types,
          const std::pair<ID, ID> &_endsHB, bool _crossover,
          const std::vector<std::pair<ID, ID>> &_ids)
-            : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover), _ids(_ids)
+            : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover), _ids(_ids), _isHJ(false)
     {
         _ds = _crossover ? _types.first == 1 && _types.second == 1 : _types.first != 3 && _types.second != 3;
         _stretchConstant = _ds ? STRETCH_DS : STRETCH_SS;
@@ -324,8 +324,8 @@ public:
     int howMany4Ways() const { return _numHJ; }
     const Edge &findEdgeFromEnds(int a, int b) const {
         return _edges.findEdgeFromEnds(a, b);
-
     }
+    const Node &findNodeFromNum(int a) { return _nodes.findTypeFromIndex(a);}
 
     void printAllNodes() {
         for (auto && item :_nodes.member())
