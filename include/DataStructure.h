@@ -181,6 +181,7 @@ class Edge {
     bool _ds; // whether is double strand
     bool _crossover; // whether is a crossover
     bool _isHJ; // whether is a Holliday junction
+    bool _isStackJunc; // whether is in stacked junctions
     std::vector<std::pair<ID,ID>> _ids;
     double _stretchConstant;
 
@@ -189,11 +190,15 @@ public:
     Edge(const std::pair<int, int> &_endsNode, const std::pair<int, int> &_types,
          const std::pair<ID, ID> &_endsHB, bool _crossover,
          const std::vector<std::pair<ID, ID>> &_ids)
-            : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover), _ids(_ids), _isHJ(false)
+            : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover),
+              _ids(_ids), _isHJ(false), _isStackJunc(false)
     {
         _ds = _crossover ? _types.first == 1 && _types.second == 1 : _types.first != 3 && _types.second != 3;
         _stretchConstant = _ds ? STRETCH_DS : STRETCH_SS;
     }
+    Edge(const std::pair<int, int> &_endsNode) // initialize stack only
+            : _endsNode(_endsNode), _types({2,2}), _endsHB({ID{}, ID{}}), _ds(true), _crossover(false),
+               _isHJ(false), _isStackJunc(true), _ids({}), _stretchConstant(STRETCH_SS/100) {}
 
     size_t length() const { return _ids.size(); }
     double get_stretchConstant() const { return _stretchConstant; }
@@ -207,6 +212,7 @@ public:
     const std::vector<std::pair<ID, ID>> &get_ids() const { return _ids; }
     bool is_isHJ() const { return _isHJ; }
     void set_isHJ(bool _isHJ) { Edge::_isHJ = _isHJ; }
+    bool is_isStackJunc() const { return _isStackJunc; }
 };
 
 /*

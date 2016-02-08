@@ -14,6 +14,7 @@
 
 #include "../include/DataStructure.h"
 #include "../include/Configure.h"
+#include "../include/Utility.h"
 
 class Origami {
 
@@ -48,6 +49,8 @@ class Origami {
 // Initialized when function processNodes, processCrossovers, connecting are invoked
     OrigamiGraph _graph;
 
+// Stacked four way junctions
+    std::vector<std::vector<int>> _stacks;
 
 
 
@@ -76,7 +79,7 @@ public:
     void toPDB(std::string str);
     void toXML(std::string str);
 
-
+    void processStackedJuncs();
 
 
 
@@ -153,6 +156,8 @@ public:
     void test() {
         std::cout << _graph.howMany4Ways() << std::endl;
     }
+
+
 
 };
 

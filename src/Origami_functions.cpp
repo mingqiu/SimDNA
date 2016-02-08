@@ -57,6 +57,8 @@ Vector3Dd Origami::helicalCenter(ID id1) {
 }
 
 
+
+
 Edge Origami::makeEdgeCrossover(ID id1, ID id2) {
     int a = _graph.findNodeNum(id1);
     int b = _graph.findNodeNum(id2);

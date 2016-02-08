@@ -52,9 +52,12 @@ void Origami::toXML(string str) {
     fprintf(xml, "  <Residue name=\"ALL\">\n");
     for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair)
         fprintf(xml, "   <Atom name=\"%d\" type=\"%d\"/>\n", aHelicalBreakPair, aHelicalBreakPair);
-    for (const auto &item: _graph.get_edges().member()) {
+    for (const auto &item: _graph.get_edges().member())
         fprintf(xml, "   <Bond from=\"%d\" to=\"%d\"/>\n", item.second.get_endsNode().first-1, item.second.get_endsNode().second-1);
-    }
+//    for (auto item3: _stacks)
+//        for (int i = 1; i < item3.size()-1; i += 2)
+//            fprintf(xml, "   <Bond from=\"%d\" to=\"%d\"/>\n", item3.at(i)-1, item3.at(i+1)-1);
+
     fprintf(xml, "  </Residue>\n");
     fprintf(xml, " </Residues>\n\n");
 
@@ -71,9 +74,10 @@ void Origami::toXML(string str) {
             length = RISE_PER_BP*(edge.length()+2);
         else {
             if (edge.is_crossover()) length = CROSSOVER_DIS;
+            else if (edge.is_isStackJunc()) length = DIST_NBBP;
             else length = RISE_PER_BP;
         }
-        k_bond = edge.is_ds() ? STRETCH_DS : STRETCH_SS;
+        k_bond = edge.get_stretchConstant();
 
 //        cout << "Node1: ";
 //        for (const auto &item1 : _graph.findNodeFromNum(edge.get_endsNode().first).get_ids())
@@ -87,6 +91,13 @@ void Origami::toXML(string str) {
                 edge.get_endsNode().first, edge.get_endsNode().second, length, k_bond);
 
     }
+//
+//    for (auto item3: _stacks)
+//        for (int i = 1; i < item3.size()-1; i += 2)
+//            fprintf(xml, "  <Bond type1=\"%d\" type2=\"%d\" length=\"%lf\" k=\"%lf\"/>\n",
+//                    item3.at(i), item3.at(i+1), RISE_PER_BP, STRETCH_SS);
+
+
     fprintf(xml, " </HarmonicBondForce>\n\n");
 
 
@@ -116,7 +127,6 @@ void Origami::toXML(string str) {
                 a1, a, b, 1.57, ANGLE_S);
         fprintf(xml, "  <Angle type1=\"%d\" type2=\"%d\" type3=\"%d\" angle=\"%lf\" k=\"%lf\"/>\n",
                 a2, a, b, 1.57, ANGLE_S);
-
     }
 
 
@@ -183,7 +193,7 @@ void Origami::toXML(string str) {
     }
 
 
-    //    for (const auto item1: _graph.get_HJ()) {
+//        for (const auto item1: _graph.get_HJ()) {
 //        a = item1.get_endsNode().first;
 //        b = item1.get_endsNode().second;
 //        a1 = _graph.connectFrom(a)[0];
@@ -196,21 +206,24 @@ void Origami::toXML(string str) {
 //        else if (b2 == a) b2 = _graph.connectFrom(b)[2];
 //        fprintf(xml, "  <Proper type1=\"%d\" type2=\"%d\" type3=\"%d\" type4=\"%d\" periodicity1=\"1\" phase1=\"%lf\""
 //                        " k1=\"%lf\"/>\n", a1, a, b, b1, 3.14, DIHEDRAL_W);
-//
+
 //    }
 
     fprintf(xml, " </PeriodicTorsionForce>\n\n");
 
 
-    // NonBondForce
-//    fprintf(xml, " <NonbondedForce coulomb14scale=\"0\" lj14scale=\"0\">\n");
-//
-//    for (const auto &item3 : _graph.get_nodes().member())
-//        fprintf(xml, "  <Atom type=\"%d\" charge=\"0\" sigma=\"%lf\" epsilon=\"%lf\"/>\n",
-//                item3.second.get_num(), item3.second.get_vdWradii(), EPSILON);
-//
-//
-//    fprintf(xml, " </NonbondedForce>\n\n");
+//     NonBondForce
+    fprintf(xml, " <CustomNonbondedForce energy="
+            "\"%lf*(((sigma1+sigma2)/r)^12-1)\" bondCutoff=\"4\">\n", EPSILON);
+
+//    fprintf(xml, "  <GlobalParameter name=\"lj14scale\" defaultValue=\"0\"/>\n");
+    fprintf(xml, "  <PerParticleParameter name=\"sigma\"/>\n");
+
+
+    for (const auto &item3 : _graph.get_nodes().member())
+        fprintf(xml, "  <Atom type=\"%d\" sigma=\"%lf\"/>\n",
+                item3.second.get_num(), item3.second.get_vdWradii());
+    fprintf(xml, " </CustomNonbondedForce>\n\n");
 
 
     fprintf(xml, "</ForceField>\n\n");

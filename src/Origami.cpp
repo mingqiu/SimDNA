@@ -271,3 +271,49 @@ void Origami::connecting() {
 
 
 
+void Origami::processStackedJuncs() {
+
+
+    queue<int> tips;
+
+    for (int i = 0; i < _graph.showGraph().size(); ++i)
+        if (_graph.showGraph().at(i).size() == 2 && _graph.findNodeType(i) == 1)
+            tips.push(i);
+
+    vector<int> visited;
+    int a, b;
+
+    while (!tips.empty()) {
+        a = tips.front();
+        tips.pop();
+        if (find(visited, a)) continue;
+        queue<int> toTrace;
+        vector<int> st;
+        toTrace.push(a);
+
+        for (int i = 0; !toTrace.empty() && i < 100; ++i) { // don't search a stack with more than 100 nodes
+            b = toTrace.front();
+            toTrace.pop();
+            st.push_back(b);
+            visited.push_back(b);
+            for (auto item : _graph.connectFrom(b))
+                if (!find(visited, item)) {
+                    toTrace.push(item);
+                }
+        }
+
+        if (st.at(st.size() - 1) == st.at(st.size() - 2)) {
+            st.pop_back();
+            _stacks.push_back(st);
+        }
+    }
+
+    pair<int , int> endsNode;
+    for (auto item3: _stacks)
+        for (int i = 1; i < item3.size() - 1; i += 2) {
+            endsNode = {item3.at(i), item3.at(i + 1)};
+            _graph.insertEdge(Edge{endsNode}, item3.at(i), item3.at(i + 1));
+//            cout << dist (_graph.findNodeFromNum(item3.at(i)).get_position(),
+//                  _graph.findNodeFromNum(item3.at(i+1)).get_position()) << endl;
+        }
+}
