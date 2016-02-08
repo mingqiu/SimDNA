@@ -36,7 +36,7 @@ bool Origami::input() {
         isABreak = isDiscontinuity(strand, base, pairStrand, pairBase,
                                    strandOld, baseOld, pairStrandOld, pairBaseOld);
         _nucleotide[ ID{strandOld, baseOld} ] =
-                Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld, yOld, zOld},
+                Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld*10, yOld*10, zOld*10},
                             ID{pairStrandOld, pairBaseOld}, isABreak};
         if (isABreak) makeHB(strandOld, baseOld);
 
@@ -93,6 +93,7 @@ void Origami::identifyDiscontinuity() {
 // if belongs to double strand
             // if it has a left neighbor discontinuity
             if ((id.baseID() - idleft.baseID()) == 1) {
+                double i = dist(helicalCenter(idright), helicalCenter(id));
                 if (dist(helicalCenter(idleft), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                     _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                          false, true, false);
@@ -141,6 +142,7 @@ void Origami::identifyDiscontinuity() {
             _axialDiscons.insert({id, {-1, -1}}, false, false, true);
 
         else if ((idright.baseID() - id.baseID()) == 1) {
+
             if (dist(helicalCenter(idright), helicalCenter(id)) > THRES_CROSSOVER_DIS) {
                 _axialDiscons.insert({id, _nucleotide[id].pairID()},
                                      false, true, false);

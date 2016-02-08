@@ -4,8 +4,12 @@
 using namespace std;
 
 int main() {
-    Origami aOrigami = {"/Users/mingqiuwang/Workspace/DNAOrigami/TestCases/" +
+//    Origami aOrigami = {"/Users/mingqiuwang/Workspace/DNAOrigami/TestCases/" +
+//                        inputJsonFileName + '.' + "pairs"};
+    Origami aOrigami = {"/Users/mingqiuwang/Workspace/DNAOrigami/TestCases/results_20160208/" +
                         inputJsonFileName + '.' + "pairs"};
+
+
 
     aOrigami.identifyDiscontinuity();
     aOrigami.processNodes();
