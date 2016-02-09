@@ -84,7 +84,10 @@ Node Origami::makeNode(AxialDiscontinuity pair1, AxialDiscontinuity pair2) {
 Node Origami::makeNode(AxialDiscontinuity pair) {
     int type = pair.is_single() ? 3 : 2;
     std::vector<std::pair<ID,ID>> ids;
+
     ids.push_back(pair.get_ids());
+//    if (ids.at(0).first.baseID()==9467)
+//        cout << endl;
     double mass = 1.0/(type - 1) * MASS;
     Vector3Dd position = helicalCenter(pair.get_ids().first);
     double vdWradii = pair.is_single() ? VDWRADII_3 : VDWRADII_2;

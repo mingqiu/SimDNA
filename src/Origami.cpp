@@ -29,12 +29,15 @@ bool Origami::input() {
     input >> _totalResidueNum >> strandOld
         >> baseOld >> xOld >> yOld >> zOld >> pairStrandOld >> pairBaseOld;
 
+    if (baseOld!=-1)++baseOld; if (pairBaseOld!=-1)++pairBaseOld;
     // read two lines(residues), and judge the first line (old residue)
     for (int i = 1; i < _totalResidueNum; ++i) {
         input >> strand >> base >> x >> y >> z >> pairStrand >> pairBase;
 
+        if (base!=-1)++base; if (pairBase!=-1)++pairBase;
         isABreak = isDiscontinuity(strand, base, pairStrand, pairBase,
                                    strandOld, baseOld, pairStrandOld, pairBaseOld);
+
         _nucleotide[ ID{strandOld, baseOld} ] =
                 Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld*10, yOld*10, zOld*10},
                             ID{pairStrandOld, pairBaseOld}, isABreak};
@@ -56,7 +59,7 @@ bool Origami::input() {
 
     // assign last residue
     _nucleotide[ ID{strand, base} ] =
-            Nucleotide{ ID{strand, base}, Vector3Dd{x, y, z}, ID{pairStrand, pairBase}, true};
+            Nucleotide{ ID{strand, base}, Vector3Dd{x*10, y*10, z*10}, ID{pairStrand, pairBase}, true};
     makeHB(strand, base);
     ++_resNumInEachStrand[strand];
 
@@ -193,6 +196,8 @@ void Origami::processNodes() {
         hb = strand[0];
         hbp = _axialDiscons.findTypeFromID({i, hb});
         for (int item = 1; item < strand.size(); ++item) {
+            if (hb==1546)
+                cout << endl;
             hbold = hb;
             hb = strand[item];
             hbpold = hbp;
@@ -206,6 +211,8 @@ void Origami::processNodes() {
                         ++item;
                         continue;
                     }
+                    if (hbold==1556)
+                        cout << endl;
                     _graph.insertNode(makeNode(hbpold, hbp));
                     if (item == strand.size() - 1) break;
                     hb = strand[item + 1];
@@ -255,7 +262,11 @@ void Origami::connecting() {
             node1 = node2;
             id2 = {i, strand[item]};
             node2 = _graph.findNodeNum(id2);
+            if (id2.baseID()==1546)
+                cout << endl;
             if (node1 == node2) continue;
+            if (node1==135||node2==135)
+                cout << endl;
             _graph.insertEdge(makeEdge(id1, id2), node1, node2);
         }
     }
@@ -318,4 +329,5 @@ void Origami::processStackedJuncs() {
 //            cout << dist (_graph.findNodeFromNum(item3.at(i)).get_position(),
 //                  _graph.findNodeFromNum(item3.at(i+1)).get_position()) << endl;
         }
+    cout << endl;
 }

@@ -155,6 +155,9 @@ public:
     }
     void test() {
         std::cout << _graph.howMany4Ways() << std::endl;
+        toIDs(719);
+        toIDs(720);
+
     }
 
 

@@ -89,6 +89,8 @@ void Nodes::insert(Node nd) {
             int size1 = this->findIndexFromID(nd.get_ids()[0].first);
             int size2 = this->findIndexFromID(nd.get_ids()[1].first);
 
+            if (size2==0)
+                cout << endl;
             nd.set_num(size1);
             _member[size1] = nd;
             for (const auto & item : nd.get_ids()) {
