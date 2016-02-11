@@ -262,11 +262,11 @@ void Origami::connecting() {
             node1 = node2;
             id2 = {i, strand[item]};
             node2 = _graph.findNodeNum(id2);
-            if (id2.baseID()==1546)
-                cout << endl;
+//            if (id2.baseID()==1546)
+//                cout << endl;
             if (node1 == node2) continue;
-            if (node1==135||node2==135)
-                cout << endl;
+//            if (node1==135||node2==135)
+//                cout << endl;
             _graph.insertEdge(makeEdge(id1, id2), node1, node2);
         }
     }
@@ -322,10 +322,13 @@ void Origami::processStackedJuncs() {
     }
 
     pair<int , int> endsNode;
+    double dis;
     for (auto item3: _stacks)
         for (int i = 1; i < item3.size() - 1; i += 2) {
             endsNode = {item3.at(i), item3.at(i + 1)};
-            _graph.insertEdge(Edge{endsNode}, item3.at(i), item3.at(i + 1));
+            dis = dist(_graph.findNodeFromNum(item3.at(i)).get_position(),
+                              _graph.findNodeFromNum(item3.at(i+1)).get_position());
+            _graph.insertEdge(Edge{endsNode, dis}, item3.at(i), item3.at(i + 1));
 //            cout << dist (_graph.findNodeFromNum(item3.at(i)).get_position(),
 //                  _graph.findNodeFromNum(item3.at(i+1)).get_position()) << endl;
         }

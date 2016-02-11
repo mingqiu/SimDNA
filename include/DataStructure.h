@@ -184,21 +184,23 @@ class Edge {
     bool _isStackJunc; // whether is in stacked junctions
     std::vector<std::pair<ID,ID>> _ids;
     double _stretchConstant;
+    double _iniLength;
 
 public:
     Edge() {}
     Edge(const std::pair<int, int> &_endsNode, const std::pair<int, int> &_types,
          const std::pair<ID, ID> &_endsHB, bool _crossover,
-         const std::vector<std::pair<ID, ID>> &_ids)
+         const std::vector<std::pair<ID, ID>> &_ids, double _iniLength)
             : _endsNode(_endsNode), _types(_types), _endsHB(_endsHB), _crossover(_crossover),
-              _ids(_ids), _isHJ(false), _isStackJunc(false)
+              _ids(_ids), _isHJ(false), _isStackJunc(false), _iniLength(_iniLength)
     {
         _ds = _crossover ? _types.first == 1 && _types.second == 1 : _types.first != 3 && _types.second != 3;
         _stretchConstant = _ds ? STRETCH_DS : STRETCH_SS;
     }
-    Edge(const std::pair<int, int> &_endsNode) // initialize stack only
+    Edge(const std::pair<int, int> &_endsNode, double _iniLength) // initialize stack only
             : _endsNode(_endsNode), _types({2,2}), _endsHB({ID{}, ID{}}), _ds(true), _crossover(false),
-               _isHJ(false), _isStackJunc(true), _ids({}), _stretchConstant(STRETCH_SS/100) {}
+               _isHJ(false), _isStackJunc(true), _ids({}),
+              _stretchConstant(STRETCH_SS/100), _iniLength(_iniLength) {}
 
     size_t length() const { return _ids.size(); }
     double get_stretchConstant() const { return _stretchConstant; }
@@ -213,6 +215,7 @@ public:
     bool is_isHJ() const { return _isHJ; }
     void set_isHJ(bool _isHJ) { Edge::_isHJ = _isHJ; }
     bool is_isStackJunc() const { return _isStackJunc; }
+    double get_iniLength() const { return _iniLength; }
 };
 
 /*
@@ -241,6 +244,7 @@ public:
 
     int idExists(ID id) const {
         // if id exists, return the index No., otherwise 0
+        if (id.baseID()==-1) return 0;
         std::unordered_map<ID, int, IDHasher>::const_iterator a = _index.find(id);
         if ( a == _index.end()) return 0;
         else return a->second;
@@ -305,13 +309,18 @@ class OrigamiGraph {
     Nodes _nodes;
     Edges _edges;
     std::vector<std::vector<int>> _origamiGraph;
+    std::vector<std::vector<int>> _OGDouble; // only for double strand
+
     int _numHJ; // how many Holliday junctions
     std::vector<Edge> _HJ;
     std::vector<Edge> _crossovers;
 
 public:
 
-    void resizeGraph() { _origamiGraph.resize(_nodes.size()+1); }
+    void resizeGraph() {
+        _origamiGraph.resize(_nodes.size()+1);
+        _OGDouble.resize(_nodes.size()+1);
+    }
     void insertNode(Node nd) { _nodes.insert(nd); }
     void insertEdge(Edge eg, int c1, int c2);
     bool findEdge(int id1, int id2) const;
@@ -320,6 +329,7 @@ public:
     int findNodeNum(ID id);
     const std::vector<std::pair<ID, ID>> &findIDsfromIndex(int a);
     const std::vector<std::vector<int>>& showGraph() const { return _origamiGraph; }
+    const std::vector<std::vector<int>>& showDoubleGraph() const { return _OGDouble; }
     int howManyNodes() { return _nodes.size();}
     Vector3Dd nodeCenter(int a) { return _nodes.findTypeFromIndex(a).get_position();}
     const Edges &get_edges() const { return _edges; }

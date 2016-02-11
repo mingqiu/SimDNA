@@ -13,14 +13,32 @@ void Origami::toPDB(string str) {
     fprintf(pdb, "MODEL     1\n");
 
     Vector3Dd coordinate;
-    std::vector<std::vector<int>> origamiAdjacencyList = _graph.showGraph();
 
-    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair) {
-        coordinate = _graph.nodeCenter(aHelicalBreakPair);
-        fprintf(pdb, "ATOM  %5d %4d ALL     1    %8.2lf%8.2lf%8.2lf\n",
-                aHelicalBreakPair, aHelicalBreakPair, coordinate.x(), coordinate.y(), coordinate.z());
-    }
+//
+//    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair) {
+//        coordinate = _graph.nodeCenter(aHelicalBreakPair);
+//        fprintf(pdb, "ATOM  %5d %4d ALL     1    %8.2lf%8.2lf%8.2lf\n",
+//                aHelicalBreakPair, aHelicalBreakPair, coordinate.x(), coordinate.y(), coordinate.z());
+//    }
 
+    for (const auto & item : _graph.get_nodes().member())
+        fprintf(pdb, "ATOM  %5d %4d ALL    1    %8.2lf%8.2lf%8.2lf\n",
+                item.second.get_num(), item.second.get_type(), item.second.get_position().x(),
+                item.second.get_position().y(), item.second.get_position().z());
+
+
+    cout << "node number "<< _graph.get_nodes().member().size() << endl;
+
+//    std::vector<std::vector<int>> origamiAdjacencyList = _graph.showGraph();
+//    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
+//        fprintf(pdb, "CONECT%5d", aHelicalBreakPair);
+//        for (auto connectingHelicalPair : origamiAdjacencyList[aHelicalBreakPair]) {
+//            fprintf(pdb, "%5d", connectingHelicalPair);
+//        }
+//        fprintf(pdb, "\n");
+//    }
+
+    std::vector<std::vector<int>> origamiAdjacencyList = _graph.showDoubleGraph();
     for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
         fprintf(pdb, "CONECT%5d", aHelicalBreakPair);
         for (auto connectingHelicalPair : origamiAdjacencyList[aHelicalBreakPair]) {
@@ -28,6 +46,7 @@ void Origami::toPDB(string str) {
         }
         fprintf(pdb, "\n");
     }
+
 
     fprintf(pdb, "ENDMDL\n");
     fclose(pdb);
@@ -70,6 +89,9 @@ void Origami::toXML(string str) {
     Edge edge;
     for (const auto & item :_graph.get_edges().member()) {
         edge = item.second;
+#ifdef INILENGTH
+        length = edge.get_iniLength()/10.0;
+#else
         if (edge.length())
             length = RISE_PER_BP*(edge.length()+2);
         else {
@@ -77,6 +99,7 @@ void Origami::toXML(string str) {
             else if (edge.is_isStackJunc()) length = DIST_NBBP;
             else length = RISE_PER_BP;
         }
+#endif // INILENGTH
         k_bond = edge.get_stretchConstant();
 
 //        cout << "Node1: ";

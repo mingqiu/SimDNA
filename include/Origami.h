@@ -151,12 +151,14 @@ private:
 public:
     void toIDs(int i) {
         for (const auto & item : _graph.findIDsfromIndex(i))
-            std::cout << item.first << "\t" << item.second << std::endl;
+            std::cout << item.first << "\t" << item.second << "\t";
+        std::cout << std::endl;
+
     }
     void test() {
         std::cout << _graph.howMany4Ways() << std::endl;
-        toIDs(719);
-        toIDs(720);
+        toIDs(5);
+        toIDs(426);
 
     }
 

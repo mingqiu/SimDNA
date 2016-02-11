@@ -14,6 +14,8 @@
 //const std::string inputJsonFileName = "aNANO_3D_7_14";
 //const std::string inputJsonFileName = "rectangle-0";
 //const std::string inputJsonFileName = "rectangle_hole-0";
+//const std::string inputJsonFileName = "rectangle_5x5-0";
+//const std::string inputJsonFileName = "rectangle_loop-0";
 const std::string inputJsonFileName = "smile-0";
 
 
@@ -34,5 +36,8 @@ const std::string inputJsonFileName = "smile-0";
 #define VDWRADII_2 1 // (nm) vdw radii of type 2# node
 #define VDWRADII_3 0.3 // (nm) vdw radii of type 3# node
 #define EPSILON 0.01
+
+
+#define INILENGTH
 
 #endif //SIMDNA_CONFIGURE_H

@@ -23,6 +23,10 @@ void OrigamiGraph::insertEdge(Edge eg, int c1, int c2) {
         _edges.insert(eg);
         _origamiGraph[c1].push_back(c2);
         _origamiGraph[c2].push_back(c1);
+        if (eg.is_ds()) {
+            _OGDouble[c1].push_back(c2);
+            _OGDouble[c2].push_back(c1);
+        }
     }
 }
 
@@ -75,7 +79,16 @@ void OrigamiGraph::findHollidayJ() {
 
 
 void Nodes::insert(Node nd) {
-    if (!this->idExists(nd.get_ids()[0].first)) {
+    bool existed = false;
+
+    if (this->idExists(nd.get_ids().at(0).first)) {
+        existed = true;
+    }
+    else if (nd.get_type()==1) if (this->idExists(nd.get_ids().at(1).first)) {
+        existed = true;
+    }
+
+    if (!existed) {
         ++_size;
         nd.set_num(_size);
         _member[_size] = nd;
@@ -84,21 +97,24 @@ void Nodes::insert(Node nd) {
             if (item.second.baseID() != -1) _index[item.second] = _size;
         }
     }
-    else {
-        if (this->findTypeFromID(nd.get_ids()[0].first).get_type()==2 &&nd.get_type()==1) {
+    else if (nd.get_type()==1){
+        if ((this->findTypeFromID(nd.get_ids()[0].first).get_type()==2||
+        this->findTypeFromID(nd.get_ids()[1].first).get_type()==2)
+            &&nd.get_type()==1) {
             int size1 = this->findIndexFromID(nd.get_ids()[0].first);
             int size2 = this->findIndexFromID(nd.get_ids()[1].first);
-
-            if (size2==0)
-                cout << endl;
+            if (size1==0) { size1=size2; size2=0;}
             nd.set_num(size1);
             _member[size1] = nd;
             for (const auto & item : nd.get_ids()) {
                 if (item.first.baseID() != -1) _index[item.first] = size1;
                 if (item.second.baseID() != -1) _index[item.second] = size1;
             }
-            nd = _member[_size];
+            if (size2==0) return;
 
+
+
+            nd = _member[_size];
             nd.set_num(size2);
             _member[size2] = nd;
             for (const auto & item : nd.get_ids()) {
@@ -108,5 +124,6 @@ void Nodes::insert(Node nd) {
             _member.erase(_size);
             --_size;
         }
+
     }
 }

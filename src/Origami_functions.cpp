@@ -64,7 +64,9 @@ Edge Origami::makeEdgeCrossover(ID id1, ID id2) {
     int b = _graph.findNodeNum(id2);
     int c = _graph.findNodeType(id1);
     int d = _graph.findNodeType(id2);
-    return Edge({a, b}, {c, d}, {id1, id2}, true, {});
+
+    double dis = dist(_graph.findNodeFromNum(a).get_position(), _graph.findNodeFromNum(b).get_position());
+    return Edge({a, b}, {c, d}, {id1, id2}, true, {}, dis);
 }
 
 Node Origami::makeNode(AxialDiscontinuity pair1, AxialDiscontinuity pair2) {
@@ -114,6 +116,7 @@ Edge Origami::makeEdge(ID id1, ID id2) {
         for (int item = id2.baseID()+1; item < id1.baseID(); ++item)
             ids.push_back({{strand, item}, _nucleotide[{strand, item}].pairID()});
 
-    return Edge({a, b}, {c, d}, {id1, id2}, false, ids);
+    double dis = dist(_graph.findNodeFromNum(a).get_position(), _graph.findNodeFromNum(b).get_position());
+    return Edge({a, b}, {c, d}, {id1, id2}, false, ids, dis);
 }
 
