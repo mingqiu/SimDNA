@@ -11,32 +11,14 @@ void Origami::toPDB(string str) {
     const char *pdbName = str.c_str();
     if ((pdb = fopen(pdbName, "w")) == NULL){ printf("\nerror on open pdb file!"); exit(0); }
     fprintf(pdb, "MODEL     1\n");
-
     Vector3Dd coordinate;
 
-//
-//    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair) {
-//        coordinate = _graph.nodeCenter(aHelicalBreakPair);
-//        fprintf(pdb, "ATOM  %5d %4d ALL     1    %8.2lf%8.2lf%8.2lf\n",
-//                aHelicalBreakPair, aHelicalBreakPair, coordinate.x(), coordinate.y(), coordinate.z());
-//    }
+#ifdef DOUBLEONLY
 
     for (const auto & item : _graph.get_nodes().member())
         fprintf(pdb, "ATOM  %5d %4d ALL    1    %8.2lf%8.2lf%8.2lf\n",
                 item.second.get_num(), item.second.get_type(), item.second.get_position().x(),
                 item.second.get_position().y(), item.second.get_position().z());
-
-
-    cout << "node number "<< _graph.get_nodes().member().size() << endl;
-
-//    std::vector<std::vector<int>> origamiAdjacencyList = _graph.showGraph();
-//    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
-//        fprintf(pdb, "CONECT%5d", aHelicalBreakPair);
-//        for (auto connectingHelicalPair : origamiAdjacencyList[aHelicalBreakPair]) {
-//            fprintf(pdb, "%5d", connectingHelicalPair);
-//        }
-//        fprintf(pdb, "\n");
-//    }
 
     std::vector<std::vector<int>> origamiAdjacencyList = _graph.showDoubleGraph();
     for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
@@ -47,6 +29,25 @@ void Origami::toPDB(string str) {
         fprintf(pdb, "\n");
     }
 
+#else
+
+    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair) {
+        coordinate = _graph.nodeCenter(aHelicalBreakPair);
+        fprintf(pdb, "ATOM  %5d %4d ALL     1    %8.2lf%8.2lf%8.2lf\n",
+                aHelicalBreakPair, aHelicalBreakPair, coordinate.x(), coordinate.y(), coordinate.z());
+    }
+
+    std::vector<std::vector<int>> origamiAdjacencyList = _graph.showGraph();
+    for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
+        fprintf(pdb, "CONECT%5d", aHelicalBreakPair);
+        for (auto connectingHelicalPair : origamiAdjacencyList[aHelicalBreakPair]) {
+            fprintf(pdb, "%5d", connectingHelicalPair);
+        }
+        fprintf(pdb, "\n");
+    }
+
+
+#endif // DOUBLEONLY
 
     fprintf(pdb, "ENDMDL\n");
     fclose(pdb);

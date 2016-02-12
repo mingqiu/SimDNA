@@ -7,16 +7,16 @@
 
 
 #define TEST 0 // if 1: turn on test; 0: off
-
+//#define DOUBLEONLY // only show edges of double helix
 //const std::string inputJsonFileName = "fourhelix";
 //const std::string inputJsonFileName = "A_2D";
 //const std::string inputJsonFileName = "pointer_v1_12_no_deletion";
 //const std::string inputJsonFileName = "aNANO_3D_7_14";
 //const std::string inputJsonFileName = "rectangle-0";
 //const std::string inputJsonFileName = "rectangle_hole-0";
-//const std::string inputJsonFileName = "rectangle_5x5-0";
+const std::string inputJsonFileName = "rectangle_5x5-0";
 //const std::string inputJsonFileName = "rectangle_loop-0";
-const std::string inputJsonFileName = "smile-0";
+//const std::string inputJsonFileName = "smile-0";
 
 
 
