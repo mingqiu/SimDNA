@@ -14,7 +14,11 @@
 //const std::string inputJsonFileName = "aNANO_3D_7_14";
 //const std::string inputJsonFileName = "rectangle-0";
 //const std::string inputJsonFileName = "rectangle_hole-0";
-const std::string inputJsonFileName = "rectangle_5x5-0";
+const std::string inputJsonFileName = "rectangle_3x3-0";
+//const std::string inputJsonFileName = "rectangle_4x4-0";
+//const std::string inputJsonFileName = "rectangle_5x5-0";
+
+
 //const std::string inputJsonFileName = "rectangle_loop-0";
 //const std::string inputJsonFileName = "smile-0";
 

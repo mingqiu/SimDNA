@@ -28,13 +28,16 @@ bool Origami::input() {
 
     input >> _totalResidueNum >> strandOld
         >> baseOld >> xOld >> yOld >> zOld >> pairStrandOld >> pairBaseOld;
-
-    if (baseOld!=-1)++baseOld; if (pairBaseOld!=-1)++pairBaseOld;
+;
+    if (baseOld!=-1)strandOld = 0; if (pairBaseOld!=-1)pairStrandOld = 0;
+//    if (baseOld!=-1)++baseOld; if (pairBaseOld!=-1)++pairBaseOld;
     // read two lines(residues), and judge the first line (old residue)
     for (int i = 1; i < _totalResidueNum; ++i) {
         input >> strand >> base >> x >> y >> z >> pairStrand >> pairBase;
 
-        if (base!=-1)++base; if (pairBase!=-1)++pairBase;
+        if (base!=-1)strand = 0; if (pairBase!=-1)pairStrand = 0;
+
+//        if (base!=-1)++base; if (pairBase!=-1)++pairBase;
         isABreak = isDiscontinuity(strand, base, pairStrand, pairBase,
                                    strandOld, baseOld, pairStrandOld, pairBaseOld);
 
