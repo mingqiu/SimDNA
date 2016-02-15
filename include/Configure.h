@@ -8,26 +8,28 @@
 
 #define TEST 0 // if 1: turn on test; 0: off
 //#define DOUBLEONLY // only show edges of double helix
+#define INILENGTH
+
 //const std::string inputJsonFileName = "fourhelix";
 //const std::string inputJsonFileName = "A_2D";
 //const std::string inputJsonFileName = "pointer_v1_12_no_deletion";
 //const std::string inputJsonFileName = "aNANO_3D_7_14";
 //const std::string inputJsonFileName = "rectangle-0";
 //const std::string inputJsonFileName = "rectangle_hole-0";
-const std::string inputJsonFileName = "rectangle_3x3-0";
+//const std::string inputJsonFileName = "rectangle_3x3-0";
 //const std::string inputJsonFileName = "rectangle_4x4-0";
 //const std::string inputJsonFileName = "rectangle_5x5-0";
 
 
 //const std::string inputJsonFileName = "rectangle_loop-0";
-//const std::string inputJsonFileName = "smile-0";
+const std::string inputJsonFileName = "smile-0";
 
 
 
 
 #define MASS 649 // (g/mol)
 #define STRETCH_DS 1 // (pN/nm)
-#define STRETCH_SS 0.01 // (pN/nm)
+#define STRETCH_SS 0.0001 // (pN/nm)
 #define ANGLE_W 0.1
 #define ANGLE_S 1.0
 #define DIHEDRAL_S 0.1
@@ -42,6 +44,5 @@ const std::string inputJsonFileName = "rectangle_3x3-0";
 #define EPSILON 0.01
 
 
-#define INILENGTH
 
 #endif //SIMDNA_CONFIGURE_H

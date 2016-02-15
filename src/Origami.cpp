@@ -28,21 +28,20 @@ bool Origami::input() {
 
     input >> _totalResidueNum >> strandOld
         >> baseOld >> xOld >> yOld >> zOld >> pairStrandOld >> pairBaseOld;
-;
-    if (baseOld!=-1)strandOld = 0; if (pairBaseOld!=-1)pairStrandOld = 0;
+//    if (baseOld!=-1)strandOld = 0; if (pairBaseOld!=-1)pairStrandOld = 0;
 //    if (baseOld!=-1)++baseOld; if (pairBaseOld!=-1)++pairBaseOld;
     // read two lines(residues), and judge the first line (old residue)
     for (int i = 1; i < _totalResidueNum; ++i) {
         input >> strand >> base >> x >> y >> z >> pairStrand >> pairBase;
 
-        if (base!=-1)strand = 0; if (pairBase!=-1)pairStrand = 0;
+//        if (base!=-1)strand = 0; if (pairBase!=-1)pairStrand = 0;
 
 //        if (base!=-1)++base; if (pairBase!=-1)++pairBase;
         isABreak = isDiscontinuity(strand, base, pairStrand, pairBase,
                                    strandOld, baseOld, pairStrandOld, pairBaseOld);
 
         _nucleotide[ ID{strandOld, baseOld} ] =
-                Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld*10, yOld*10, zOld*10},
+                Nucleotide{ ID{strandOld, baseOld}, Vector3Dd{xOld, yOld, zOld},
                             ID{pairStrandOld, pairBaseOld}, isABreak};
         if (isABreak) makeHB(strandOld, baseOld);
 
@@ -62,7 +61,7 @@ bool Origami::input() {
 
     // assign last residue
     _nucleotide[ ID{strand, base} ] =
-            Nucleotide{ ID{strand, base}, Vector3Dd{x*10, y*10, z*10}, ID{pairStrand, pairBase}, true};
+            Nucleotide{ ID{strand, base}, Vector3Dd{x, y, z}, ID{pairStrand, pairBase}, true};
     makeHB(strand, base);
     ++_resNumInEachStrand[strand];
 
