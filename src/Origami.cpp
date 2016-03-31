@@ -198,8 +198,7 @@ void Origami::processNodes() {
         hb = strand[0];
         hbp = _axialDiscons.findTypeFromID({i, hb});
         for (int item = 1; item < strand.size(); ++item) {
-            if (hb==1546)
-                cout << endl;
+
             hbold = hb;
             hb = strand[item];
             hbpold = hbp;
@@ -213,8 +212,7 @@ void Origami::processNodes() {
                         ++item;
                         continue;
                     }
-                    if (hbold==1556)
-                        cout << endl;
+
                     _graph.insertNode(makeNode(hbpold, hbp));
                     if (item == strand.size() - 1) break;
                     hb = strand[item + 1];
@@ -334,5 +332,4 @@ void Origami::processStackedJuncs() {
 //            cout << dist (_graph.findNodeFromNum(item3.at(i)).get_position(),
 //                  _graph.findNodeFromNum(item3.at(i+1)).get_position()) << endl;
         }
-    cout << endl;
 }
