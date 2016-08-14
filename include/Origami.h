@@ -52,6 +52,7 @@ class Origami {
 // Stacked four way junctions
     std::vector<std::vector<int>> _stacks;
 
+    std::vector<VirtualSite> _vs;
 
 
 public:
@@ -80,7 +81,6 @@ public:
     void toXML(std::string str);
 
     void processStackedJuncs();
-
 
 
 
@@ -156,6 +156,8 @@ public:
     void test() {
         std::cout << _graph.howMany4Ways() << std::endl;
     }
+
+    void vitualSite();
 
 
 

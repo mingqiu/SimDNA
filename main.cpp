@@ -12,12 +12,12 @@ int main() {
     aOrigami.processCrossovers();
     aOrigami.processStackedJuncs();
     aOrigami.connecting();
+    aOrigami.vitualSite();
 
     aOrigami.toPDB("/Users/mingqiuwang/Workspace/DNAOrigami/SimDNA/results/Debug/" +
                    inputJsonFileName + '.' + "pdb");
     aOrigami.toXML("/Users/mingqiuwang/Workspace/DNAOrigami/SimDNA/results/Debug/" +
                    inputJsonFileName + '.' + "xml");
-//    aOrigami.test();
 
 
     return 0;

@@ -21,6 +21,15 @@ void Origami::toPDB(string str) {
                 aHelicalBreakPair, aHelicalBreakPair, coordinate.x(), coordinate.y(), coordinate.z());
     }
 
+    if (USE_VIR_SITE) {
+        int nodeNum = _graph.howManyNodes();
+
+        for ( const auto & x : _vs) {
+            fprintf(pdb, "ATOM  %5d %3dv ALL     1    %8.2lf%8.2lf%8.2lf\n",
+                    x.getVirNum()+nodeNum, x.getVirNum(), x.getCoordinate().x(), x.getCoordinate().y(), x.getCoordinate().z());
+        }
+    }
+
     for (auto aHelicalBreakPair = 1; aHelicalBreakPair < origamiAdjacencyList.size(); ++aHelicalBreakPair) {
         fprintf(pdb, "CONECT%5d", aHelicalBreakPair);
         for (auto connectingHelicalPair : origamiAdjacencyList[aHelicalBreakPair]) {
@@ -28,6 +37,8 @@ void Origami::toPDB(string str) {
         }
         fprintf(pdb, "\n");
     }
+
+
 
     fprintf(pdb, "ENDMDL\n");
     fclose(pdb);
@@ -40,11 +51,13 @@ void Origami::toXML(string str) {
     if ((xml = fopen(xmlName, "w")) == NULL){ printf("\nerror on open xml file!"); exit(0); }
     fprintf(xml, "<ForceField>\n\n");
 
-
     fprintf(xml, " <AtomTypes>\n");
+    if (USE_VIR_SITE)fprintf(xml, "  <Type name=\"average\" class=\"C\" mass=\"0.000000\"/>\n");
     for (const auto & item : _graph.get_nodes().member())
 
         fprintf(xml, "  <Type name=\"%d\" class=\"C\" mass=\"%lf\"/>\n", item.second.get_num(), item.second.get_mass());
+
+
     fprintf(xml, " </AtomTypes>\n\n");
 
 // Residues
@@ -52,11 +65,25 @@ void Origami::toXML(string str) {
     fprintf(xml, "  <Residue name=\"ALL\">\n");
     for (auto aHelicalBreakPair = 1; aHelicalBreakPair < _graph.howManyNodes()+1; ++aHelicalBreakPair)
         fprintf(xml, "   <Atom name=\"%d\" type=\"%d\"/>\n", aHelicalBreakPair, aHelicalBreakPair);
+    if (USE_VIR_SITE){
+        int nodeNum = _graph.howManyNodes();
+
+        for ( const auto & x : _vs )
+            fprintf(xml, "   <Atom name=\"%dv\" type=\"average\"/>\n", x.getVirNum());
+
+
+        for ( const auto & x : _vs )
+            fprintf(xml, "   <VirtualSite type=\"average2\" index=\"%d\" atom1=\"%d\" atom2=\"%d\" weight1=\"%lf\" weight2=\"%lf\"/>\n",
+            x.getVirNum()+nodeNum-1, x.getEnd1()-1, x.getEnd2()-1, x.getWeight1(), x.getWeight2());
+
+    }
+
     for (const auto &item: _graph.get_edges().member())
         fprintf(xml, "   <Bond from=\"%d\" to=\"%d\"/>\n", item.second.get_endsNode().first-1, item.second.get_endsNode().second-1);
 //    for (auto item3: _stacks)
 //        for (int i = 1; i < item3.size()-1; i += 2)
 //            fprintf(xml, "   <Bond from=\"%d\" to=\"%d\"/>\n", item3.at(i)-1, item3.at(i+1)-1);
+
 
     fprintf(xml, "  </Residue>\n");
     fprintf(xml, " </Residues>\n\n");
@@ -223,6 +250,8 @@ void Origami::toXML(string str) {
     for (const auto &item3 : _graph.get_nodes().member())
         fprintf(xml, "  <Atom type=\"%d\" sigma=\"%lf\"/>\n",
                 item3.second.get_num(), item3.second.get_vdWradii());
+
+    if (USE_VIR_SITE) fprintf(xml, "  <Atom type=\"average\" sigma=\"%f\"/>\n", VDWRADII_1);
     fprintf(xml, " </CustomNonbondedForce>\n\n");
 
 
@@ -233,3 +262,4 @@ void Origami::toXML(string str) {
     fclose(xml);
 
 }
+

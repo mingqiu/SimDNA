@@ -317,3 +317,36 @@ void Origami::processStackedJuncs() {
 //                  _graph.findNodeFromNum(item3.at(i+1)).get_position()) << endl;
         }
 }
+
+
+void Origami::vitualSite() {
+    Edge edge;
+    double length;
+    int cutoff, first, second, virNum = 0, nodeNum = _graph.howManyNodes();
+    Vector3Dd coordinate;
+    for (const auto &item : _graph.get_edges().member()) {
+        edge = item.second;
+        length = RISE_PER_BP*(edge.length()+2);
+        first = edge.get_endsNode().first;
+        second = edge.get_endsNode().second;
+        if (length>2) {
+            cutoff = int(length/2);
+//            cout << length << "\t" << cutoff << endl;
+            // create new node and reconnect nodes
+            int next = first;
+            for ( auto x = 1; x <= cutoff; ++x ) {
+                ++virNum;
+                coordinate = (_graph.nodeCenter(first) + _graph.nodeCenter(second))*(double (x)/(cutoff+1));
+                //int insert = _graph.insertVir(Node{0, {}, 0, coordinate, 1});
+                //_graph.repCon(next,second,insert);
+                //next = _graph.howManyNodes();
+//                printf("%d\tm%d\t", nodeNum+virNum, virNum);
+//                cout << coordinate;
+//                printf("%d\t%d\t%d\t%.3f\t%.3f\n", virNum-1, first, second,1-double (x)/(cutoff+1), double (x)/(cutoff+1));
+
+                _vs.push_back(VirtualSite{virNum, coordinate, first, second,
+                                         1-double (x)/(cutoff+1), double (x)/(cutoff+1)});
+            }
+        }
+    }
+}

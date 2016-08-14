@@ -74,6 +74,14 @@ void OrigamiGraph::findHollidayJ() {
 }
 
 
+int Nodes::insertVir(Node nd) {
+    ++_size;
+    nd.set_num(_size);
+    _member[_size] = nd;
+    return _size;
+}
+
+
 void Nodes::insert(Node nd) {
     if (!this->idExists(nd.get_ids()[0].first)) {
         ++_size;
@@ -107,4 +115,22 @@ void Nodes::insert(Node nd) {
             --_size;
         }
     }
+}
+
+
+/*
+ * Adds a node "c" in ad edge a--b
+ *
+ *
+ */
+void OrigamiGraph::repCon(int a, int b, int c) {
+    for (int x=0; x<_origamiGraph[a].size(); ++x)
+        if (b == _origamiGraph[a].at(x))
+            _origamiGraph[a].at(x) = c;
+    for (int x=0; x<_origamiGraph[b].size(); ++x)
+        if (a == _origamiGraph[b].at(x))
+            _origamiGraph[b].at(x) = c;
+    std::vector<int> vc = {a, b};
+    _origamiGraph.push_back(vc);
+    std::cout << vc.size() << std::endl;
 }

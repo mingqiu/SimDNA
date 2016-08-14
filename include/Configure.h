@@ -8,10 +8,11 @@
 
 #define TEST 0 // if 1: turn on test; 0: off
 
-//const std::string inputJsonFileName = "fourhelix";
+const std::string inputJsonFileName = "fourhelix";
+//const std::string inputJsonFileName = "Rothemund_rect_new_3";
 //const std::string inputJsonFileName = "A_2D";
 //const std::string inputJsonFileName = "pointer_v1_12_no_deletion";
-const std::string inputJsonFileName = "aNANO_3D_7_14";
+//const std::string inputJsonFileName = "aNANO_3D_7_14";
 
 #define MASS 649 // (g/mol)
 #define STRETCH_DS 1 // (pN/nm)
@@ -24,9 +25,10 @@ const std::string inputJsonFileName = "aNANO_3D_7_14";
 #define CROSSOVER_DIS 2.3 // (nm) equilibrium length of a crossover
 #define RISE_PER_BP 0.34 // (nm) helical rise per bp
 #define DIST_NBBP 0.367 // (nm) distance between neighbor base pair
-#define VDWRADII_1 1 // (nm) vdw radii of type 1# node
+#define VDWRADII_1 1.0 // (nm) vdw radii of type 1# node
 #define VDWRADII_2 1 // (nm) vdw radii of type 2# node
 #define VDWRADII_3 0.3 // (nm) vdw radii of type 3# node
 #define EPSILON 0.01
 
+#define USE_VIR_SITE 0 // whether or not use virtual site
 #endif //SIMDNA_CONFIGURE_H

@@ -215,11 +215,11 @@ public:
     bool is_isStackJunc() const { return _isStackJunc; }
 };
 
-/*
- * Mapping ID to abstract structure, i.e., edges, nodes, etc
- *      where Typename T is the abstracted structure
- *      all index starts from 1
- * */
+/**
+ * Maps ID with an arbitrary class, i.e., Edge, Node, etc.
+ *      where Typename T is the type of the arbitrary class,
+ *      all index starts from 1.
+ */
 template<typename T>
 class Index {
     std::unordered_map<int, T> _member;
@@ -274,6 +274,7 @@ public:
 class Nodes : public Index<Node> {
 public:
     void insert(Node nd);
+    int insertVir(Node nd);
 };
 
 class Edges : public Index<Edge> {
@@ -313,6 +314,7 @@ public:
 
     void resizeGraph() { _origamiGraph.resize(_nodes.size()+1); }
     void insertNode(Node nd) { _nodes.insert(nd); }
+    int insertVir(Node nd) { return _nodes.insertVir(nd);  }
     void insertEdge(Edge eg, int c1, int c2);
     bool findEdge(int id1, int id2) const;
     int findNodeType(ID id);
@@ -327,6 +329,8 @@ public:
     const std::vector<Edge> &get_HJ() const { return _HJ; }
     const std::vector<Edge> &get_crossovers() const { return _crossovers; }
     const std::vector<int> connectFrom(int a) const { return _origamiGraph[a]; }
+    void repCon(int a, int b, int c);
+
     int howMany4Ways() const { return _numHJ; }
     const Edge &findEdgeFromEnds(int a, int b) const {
         return _edges.findEdgeFromEnds(a, b);
@@ -346,5 +350,23 @@ public:
 
 };
 
-
+class VirtualSite {
+    int virNum;
+    Vector3Dd coordinate;
+    int end1;
+    int end2;
+    double weight1;
+    double weight2;
+    
+public:
+    VirtualSite(int virNum, const Vector3Dd &coordinate, int end1, int end2, double weight1, double weight2) : virNum(
+            virNum), coordinate(coordinate), end1(end1), end2(end2), weight1(weight1), weight2(weight2) { }
+    
+    double getWeight2() const { return weight2; }
+    int getVirNum() const { return virNum; }
+    const Vector3Dd &getCoordinate() const { return coordinate; }
+    int getEnd1() const { return end1; }
+    int getEnd2() const { return end2; }
+    double getWeight1() const { return weight1; }
+};
 #endif //SIMDNA_DATASTRUCTURE_H
