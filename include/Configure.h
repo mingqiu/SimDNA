@@ -8,8 +8,8 @@
 
 #define TEST 0 // if 1: turn on test; 0: off
 
-const std::string inputJsonFileName = "fourhelix";
-//const std::string inputJsonFileName = "Rothemund_rect_new_3";
+//const std::string inputJsonFileName = "fourhelix";
+const std::string inputJsonFileName = "Rothemund-rect";
 //const std::string inputJsonFileName = "A_2D";
 //const std::string inputJsonFileName = "pointer_v1_12_no_deletion";
 //const std::string inputJsonFileName = "aNANO_3D_7_14";
@@ -30,5 +30,6 @@ const std::string inputJsonFileName = "fourhelix";
 #define VDWRADII_3 0.3 // (nm) vdw radii of type 3# node
 #define EPSILON 0.01
 
-#define USE_VIR_SITE 0 // whether or not use virtual site
+#define USE_VIR_SITE 1 // whether or not use virtual site
+#define TOR_4WAY 1 // whether adds dihedral angles in 4 way junction
 #endif //SIMDNA_CONFIGURE_H

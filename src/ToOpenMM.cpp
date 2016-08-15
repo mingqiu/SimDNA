@@ -219,22 +219,36 @@ void Origami::toXML(string str) {
                         " k1=\"%lf\"/>\n", x1, x, y, y1, (edge.length()+2)/10.5*2*3.14-3.14, DIHEDRAL_S);
     }
 
+    if (TOR_4WAY) {
+        for (const auto item1: _graph.get_HJ()) {
+            a = item1.get_endsNode().first;
+            b = item1.get_endsNode().second;
+            a1 = _graph.connectFrom(a)[0];
+            a2 = _graph.connectFrom(a)[1];
+            if (a1 == b) a1 = _graph.connectFrom(a)[2];
+            else if (a2 == b) a2 = _graph.connectFrom(a)[2];
+            b1 = _graph.connectFrom(b)[0];
+            b2 = _graph.connectFrom(b)[1];
+            if (b1 == a) b1 = _graph.connectFrom(b)[2];
+            else if (b2 == a) b2 = _graph.connectFrom(b)[2];
+            if (dot(_graph.nodeCenter(a)-_graph.nodeCenter(a1),_graph.nodeCenter(b)-_graph.nodeCenter(b1))<0) {
+                x = b1;
+                b1 = b2;
+                b2 = x;
+            }
+            fprintf(xml, "  <Proper type1=\"%d\" type2=\"%d\" type3=\"%d\" type4=\"%d\" periodicity1=\"1\" phase1=\"%lf\""
+                    " k1=\"%lf\"/>\n", a1, a, b, b1, 3.14/6-3.14, DIHEDRAL_W);
+            fprintf(xml, "  <Proper type1=\"%d\" type2=\"%d\" type3=\"%d\" type4=\"%d\" periodicity1=\"1\" phase1=\"%lf\""
+                    " k1=\"%lf\"/>\n", a2, a, b, b2, 3.14/6-3.14, DIHEDRAL_W);
+            fprintf(xml, "  <Proper type1=\"%d\" type2=\"%d\" type3=\"%d\" type4=\"%d\" periodicity1=\"1\" phase1=\"%lf\""
+                    " k1=\"%lf\"/>\n", a1, a, b, b2, -3.14*5/6-3.14, DIHEDRAL_W);
+            fprintf(xml, "  <Proper type1=\"%d\" type2=\"%d\" type3=\"%d\" type4=\"%d\" periodicity1=\"1\" phase1=\"%lf\""
+                    " k1=\"%lf\"/>\n", a2, a, b, b1, -3.14*5/6-3.14, DIHEDRAL_W);
 
-//        for (const auto item1: _graph.get_HJ()) {
-//        a = item1.get_endsNode().first;
-//        b = item1.get_endsNode().second;
-//        a1 = _graph.connectFrom(a)[0];
-//        a2 = _graph.connectFrom(a)[1];
-//        if (a1 == b) a1 = _graph.connectFrom(a)[2];
-//        else if (a2 == b) a2 = _graph.connectFrom(a)[2];
-//        b1 = _graph.connectFrom(b)[0];
-//        b2 = _graph.connectFrom(b)[1];
-//        if (b1 == a) b1 = _graph.connectFrom(b)[2];
-//        else if (b2 == a) b2 = _graph.connectFrom(b)[2];
-//        fprintf(xml, "  <Proper type1=\"%d\" type2=\"%d\" type3=\"%d\" type4=\"%d\" periodicity1=\"1\" phase1=\"%lf\""
-//                        " k1=\"%lf\"/>\n", a1, a, b, b1, 3.14, DIHEDRAL_W);
+        }
+    }
 
-//    }
+
 
     fprintf(xml, " </PeriodicTorsionForce>\n\n");
 
